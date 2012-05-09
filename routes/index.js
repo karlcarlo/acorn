@@ -132,11 +132,11 @@ exports.md_html = function(req, res, next){
     urlPath.push('.' + ext);
   }
   urlPath = urlPath.join('');
-  console.log('urlPath: ' + urlPath);
+  //console.log('urlPath: ' + urlPath);
 
   var filePath = path.normalize('./views/' + urlPath);
 
-  console.log('filePath: ' + filePath);
+  //console.log('filePath: ' + filePath);
 
   path.exists(filePath, function(exists){
     //console.log(exists);
