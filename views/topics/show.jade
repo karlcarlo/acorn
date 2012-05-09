@@ -1,0 +1,66 @@
+.breadcrumb
+  li
+    a(href='/') 首页
+    span.divider /
+  li
+    a(href='/topics') 话题
+    span.divider /
+  li.active
+    | 全文
+
+include ../includes/messages
+
+.row-fluid
+  .pull-right
+    - if(locals.member)
+      - if(topic.author._id == member._id || member.is_root)
+        a(href='/topics/#{ topic._id }/edit').btn.btn-info 编辑
+
+.row-fluid.list-item
+  .title.clearfix
+    h2= topic.title
+    .meta
+      .meta-avatar
+        a(href='/profile/#{topic.author.id}')
+          img(src=topic.author.avatar, alt=topic.author.name, height='48', width='48')
+      span.meta-author
+        i.icon-user
+        a(href='/profile/#{topic.author.id}')= topic.author.name
+      span.meta-timestamp
+        i.icon-calendar
+        a(href='#')= topic.timestamp.less
+
+      span.meta-comment
+        i.icon-comment
+        a(href='#comment')#comment_count= (topic.comments)? topic.comments.length : '添加评论'
+      span.meta-visit
+        i.icon-flag
+        a(href='#')= topic.visit_count
+        
+  .topic.clearfix
+    // .photo
+    .caption#topic_content!= topic.content
+
+  .tag-list.clearfix
+    span.meta-tags
+      i.icon-tags
+      - each tag in topic.tags
+        a(href='/topics?tag=#{tag._id}', title='#{tag.description}')= tag.name
+
+  //
+    .share-list.clearfix
+      | 分享到：
+      a(href='#', title='分享到搜狐微博').share-to.s-tsohu 搜狐微博
+
+    .topic-navigation.clearfix
+      span.prev.pull-left
+        a(href='#') 上一话题
+      span.next.pull-right
+        a(href='#') 下一话题
+
+  div.comment-anchor
+    a(name='comment')
+  div(data-id=topic.id)#comment_wrapper.comments.clearfix
+
+script
+  require(['/javascripts/page/topic.show.js']);

@@ -1,0 +1,150 @@
+/* global */
+body {
+  font-family: "Microsoft Yahei", Helvetica, Arial, sans-serif;
+  color: #444;
+}
+
+input[type=text],
+input[type=password] {
+  background-color: @ipt_bgc;
+}
+
+textarea {
+  resize: vertical;
+  background-color: @ipt_bgc;
+}
+
+.footer {
+  border-top: 2px solid #eaeaea;
+  margin-top: 40px;
+  padding: 19px 0 20px;
+  background-color: #d6d6d6;
+
+  a,
+  a:visited {
+    color: #4183C4;
+  }
+
+  p {
+    color: #555;
+  }
+}
+
+.navbar-wrapper {
+  height: 40px;
+  position: relative;
+}
+
+.paragraph {
+  text-indent: 2em;
+}
+
+.centered {
+  text-align: center;
+}
+
+.cell {
+  padding: 20px;
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
+/* tag */
+.tags {
+  margin-left: 10px;
+
+  .tag {
+    display: inline-block;
+    background-color: #999999;
+    border-radius: 3px 3px 3px 3px;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 1px 4px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    margin: 0 5px;
+    cursor: pointer;
+    
+    .checkbox-wrapper {
+      display: block;
+      position: relative;
+      overflow: hidden;
+
+      input[type=checkbox] {
+        display: inline-block;
+        position: absolute;
+        left: -99px;
+        top: 0;
+      }
+    }
+  }
+
+  .tag-checked {
+    background-color: #3A87AD;
+
+    &:hover {
+      background-color: #2d6987;
+    }
+  }
+}
+
+/* share icon */
+.share-list {
+  padding: 10px 0;
+
+  .share-to {
+    display: inline-block;
+    margin-right: 8px;
+    padding-left: 20px;
+    height: 16px;
+    line-height: 16px;
+    cursor: pointer;
+    background: url(../images/icon_share.png) no-repeat;
+    font-size: 12px;
+  }
+
+  .s-tsohu {
+    background-position: 0 -144px;
+  }
+
+  .s-tqq {
+    background-position: 0 0;
+  }
+
+  .s-qzone {
+    background-position: 0 -96px;
+  }
+
+  .s-tsina {
+    background-position: 0 -16px;
+  }
+
+  .s-renren {
+    background-position: 0 -112px;
+  }
+
+  .s-kaixin {
+    background-position: 0 -128px;
+  }
+
+  .s-douban {
+    background-position: 0 -32px;
+  }
+
+  .s-facebook {
+    background-position: 0 -48px;
+  }
+
+  .s-twitter {
+    background-position: 0 -64px;
+  }
+
+}
+
+.permission-wrapper {
+  margin: 20px 0 0;
+
+  select {
+    margin-left: 10px;
+  }
+}

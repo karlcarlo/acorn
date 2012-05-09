@@ -1,0 +1,51 @@
+.breadcrumb
+  li
+    a(href='/') 首页
+    span.divider /
+  li.active
+    | 话题
+
+include ../includes/messages
+
+.row-fluid
+  .pull-right
+    - if(locals.member)
+      a(href='/topics/new').btn.btn-info 发布新话题
+
+- each topic in topics
+  .row-fluid.list-item
+    .title.clearfix
+      h2
+        a(href='/topics/#{topic._id}')
+          span.date= topic.timestamp.month + '/' + topic.timestamp.date + ' '
+          | #{topic.title}
+      .meta
+        .meta-avatar
+          a(href='/profile/' + topic.author.id)
+            img(src=topic.author.avatar, alt=topic.author.name, height='48', width='48')
+        span.meta-author
+          i.icon-user
+          a(href='/profile/#{topic.author.id}')= topic.author.name
+        span.meta-tags
+          i.icon-tags
+          - each tag in topic.tags
+            a(href='/topics?tag=#{tag._id}', title='#{tag.description}')= tag.name
+        span.meta-comment
+          i.icon-comment
+          a(href='/topics/#{topic._id}#comment')= (topic.comments)? topic.comments.length : 0
+        span.meta-visit
+          i.icon-flag
+          a(href='#')= topic.visit_count
+          
+    .topic
+      .caption!= topic.brief
+
+.pagination.pagination-centered
+  ul
+    li
+      a(href=pagination.link_to + '?page=' + pagination.prev_page) 前页
+    - for(var i = 0; i < pagination.max_pages; i++)
+      li(class=(pagination.current_page == i)? 'active' : '')
+        a(href=pagination.link_to + '?page=' + i)= i + 1
+    li
+      a(href=pagination.link_to + '?page=' + pagination.next_page) 后页

@@ -1,0 +1,38 @@
+include ../includes/messages
+
+.row
+  .span2.sidebar
+    include ../includes/sidebar_person
+  .span10
+    .page-header
+      .pull-right
+      h1 设置
+        | 
+        small 修改个人信息
+
+    form(action='/set', method='post').form-horizontal
+      .control-group
+        label.control-label
+          strong 邮箱
+        .controls
+          .input-prepend
+            span.add-on
+              i.icon-envelope
+            input(type='text', name='', value=locals.email, disabled='disabled').span3
+          p.help-block
+      .control-group
+        label.control-label
+          strong 昵称
+        .controls
+          .input-prepend
+            span.add-on
+              i.icon-user
+            input(type='text', name='name', value=locals.name).span3
+          p.help-block 长度控制在2~20个字符
+
+      .form-actions
+        button(type='submit').btn.btn-primary
+          | 确认修改
+
+script
+  require(['/javascripts/page/person.set.js']);

@@ -1,0 +1,22 @@
+.avatar.centered
+  .photo-frame
+    img(src=member.avatar, alt=member.name, width='72', height='72')
+  .person-meta.centered
+    span= member.name
+  p
+.tabs-left.pull-right
+  ul#person_sidebar_nav.nav.nav-tabs
+    li.person-sidebar-profile
+      a(href='/profile') 用户中心
+    li.person-sidebar-set
+      a(href='/set') 设置个人信息
+    li.person-sidebar-set-password
+      a(href='/set_password') 修改密码
+
+    - if(member.is_root)
+      li.person-sidebar-comments
+        a(href='/comments') 评论管理
+      li.person-sidebar-tags
+        a(href='/tags') 标签管理
+      li.person-sidebar-people
+        a(href='/people') 用户管理

@@ -1,0 +1,31 @@
+include ../includes/messages
+
+.row
+  .span2.sidebar
+    include ../includes/sidebar_person
+  .span10
+    .page-header
+      .pull-right
+        a(href='/signup').btn.btn-info 添加新用户
+      h1 用户管理
+
+    table.people-list.table.table-condensed
+      thead
+        tr
+          th 邮箱
+          th 名称
+          th 日期
+          th 操作
+      tbody
+        - each person in people
+          tr
+            td= person.email
+            td= person.name
+            td= person.timestamp.less
+            td
+              a(href='/people/#{person._id}/delete').person-destroy-action
+                i.icon-remove
+
+
+script
+  require(['/javascripts/page/person.people.js']);

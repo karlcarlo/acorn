@@ -1,0 +1,30 @@
+.navbar-wrapper
+  .navbar.navbar-fixed-top
+    .navbar-inner
+      .container
+        a(data-toggle='collapse', data-target='.nav-collapse').btn.btn-navbar
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a(href='/').brand
+          | Acorn
+          span.desc Lightweight Markdown blog
+        .nav-collapse
+          .pull-right
+            ul.nav
+              li
+                a(href='http://ux.sohu.com', target='_blank') NutUX
+
+              li.divider-vertical
+
+              - if(locals.member)
+                li
+                  a(href='/profile', title=member.email) #{member.name}
+                li
+                  a(href='/signout', title='退出').icon
+                    i.icon-off.icon-white
+              - else
+                li
+                  a(href='/signin') 登录
+                li
+                  a(href='/signup') 注册
