@@ -1,7 +1,7 @@
 橡树果 Acorn
 =====
 
-Acorn是一个轻量的Markdown博客，基于NodeJS、Express、MongoDB等构建，由[NutUX](http://ux.sohu.com)团队开发，可以很方便的搭建个人博客站点。
+Acorn是一个轻量的Markdown博客，基于NodeJS、Express、MongoDB等构建，可以很方便的搭建个人博客站点。
 
 
 安装 Install
