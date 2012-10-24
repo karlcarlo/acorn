@@ -129,4 +129,4 @@ app.get('*', function(req, res){
 });
 
 app.listen(config.application.port);
-console.log("%s server listening on port %d in %s mode", config.application.name, app.address().port, app.settings.env);
+console.log("%s server listening on port %d in %s mode", config.application.name, config.application.port, app.settings.env);
