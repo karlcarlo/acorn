@@ -2,15 +2,17 @@
 console.log('\nAcorn init start...');
 var fs = require('fs')
   , path = require('path')
+  , util = require('util')
   , mongoose = require('mongoose')
+  , EventProxy = require('eventproxy')
   , config= require('../config').config;
 
 // mongodb connect
 mongoose.connect(config.database.url, function(err){
-	if(err){
-		console.log('connect to db error: ' + err.message);
-		process.exit(1);
-	}
+  if(err){
+    console.log('connect to db error: ' + err.message);
+    process.exit(1);
+  }
 });
 
 // Models
@@ -24,6 +26,11 @@ Person = mongoose.model('Person');
 Topic = mongoose.model('Topic');
 Tag = mongoose.model('Tag');
 Message = mongoose.model('Message');
+
+function init_start(){
+  //add_root();
+  set_env();
+}
 
 // 创建管理员帐户
 function add_root(){
@@ -85,20 +92,68 @@ function add_topic(person, tag){
 
 function add_comment(person, topic){
   var message = new Message();
-    message.type = 'comment';
-    message.content = '欢迎使用评论';
-    message.topic = topic._id;
-    message.author = person._id;
+  message.type = 'comment';
+  message.content = '欢迎使用评论';
+  message.topic = topic._id;
+  message.author = person._id;
 
-    message.save(function(err){
-      topic.comments.push(message);
-      topic.save(function(err){
-        console.log('comment was successfully added.');
-        
-        console.log('Acorn init well done, get started now.');
-        mongoose.disconnect();
-      });
+  message.save(function(err){
+    topic.comments.push(message);
+    topic.save(function(err){
+      console.log('comment was successfully added.');
+      
+      // 初始化环境
+      set_env();
     });
+  });
 }
 
-add_root();
+function set_env(){
+  var basedir = path.normalize(__dirname + '/../')
+    , tmpdir = path.join(basedir, 'tmp')
+    , uploaddir = path.join(basedir, 'public/uploads');
+    
+  //console.log(tmpdir);
+  
+  
+  var proxy = new EventProxy();
+  
+  proxy.assign('make_tmp_dir', 'make_upload_dir', lastly);
+  
+  fs.exists(tmpdir, function(exists){
+    
+    if(!exists){
+      fs.mkdir(tmpdir, function(){
+        util.log('tmp directory was successfully created.');
+        proxy.trigger('make_tmp_dir');
+      });
+    }
+    else{
+      proxy.trigger('make_tmp_dir');
+    }
+    
+  });
+  
+  fs.exists(uploaddir, function(exists){
+    
+    if(!exists){
+      fs.mkdir(uploaddir, function(){
+        util.log('upload directory was successfully created.');
+        proxy.trigger('make_upload_dir');
+      });
+    }
+    else{
+      proxy.trigger('make_tmp_dir');
+    }
+    
+  });  
+  
+}
+
+function lastly(){
+  console.log('Acorn init well done, get started now.');
+  mongoose.disconnect();
+  process.exit(0);
+}
+
+init_start();

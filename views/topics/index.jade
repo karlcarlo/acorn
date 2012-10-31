@@ -38,6 +38,10 @@ include ../includes/messages
           a(href='#')= topic.visit_count
           
     .topic
+      - if(topic.is_elite)
+        .topimg
+          a(href='/topics/#{topic._id}')
+            span.img(style='background: url(' + topic.topimg + ') no-repeat center;', title=topic.title)
       .caption!= topic.brief
 
 .pagination.pagination-centered

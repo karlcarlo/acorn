@@ -17,29 +17,40 @@ var helpers = require('../helpers');
  */
 exports.index = function(req, res, next){
 
-
-  Person
-  .find({}, ['_id', 'name', 'email', 'avatar', 'created_at'], { sort: [[ 'created_at', 'asc' ]] })
-  .run(function(err, people){
-
-    if(req.params.format && req.params.format == 'json'){
-      var res_obj = {
-        success: true,
-        message: '',
-        people: []
-      };
-
+  if(req.params.format && req.params.format == 'json'){
+    var res_obj = {
+      success: true,
+      message: '',
+      people: []
+    };
+    
+    Person
+    .find({ active: true }, ['_id', 'name', 'email', 'avatar', 'title', 'motto', 'duty', 'created_at'], { sort: [[ 'created_at', 'asc' ]] })
+    .run(function(err, people){
       res_obj.people = people;
       res.json(res_obj);
+    });
+  }
+  else{
+    
+    if(!req.session.person || !req.session.person.is_root){
+      req.flash('msg_alert', '您没有操作权限。');
+      res.redirect('/notify');
+      return;
     }
-    else{
+    
+    Person
+    .find({}, null, { sort: [[ 'created_at', 'desc' ]] })
+    .run(function(err, people){
+
       res.locals({
         people: people,
         layout: 'layouts/person'
       });
+      
       res.render('people/index');
-    }
-  });
+    });
+  }
 
 };
 
@@ -80,24 +91,36 @@ exports.set = function(req, res, next){
 
   var method = req.method.toLowerCase();
   if(method == 'get'){
-    res.render('people/set', { name: session_person.name });
+    res.render('people/set', {
+      name: session_person.name, 
+      person_title: session_person.title, 
+      motto: session_person.motto
+    });
     return;
   }
 
   if(method == 'post'){
     
-    var name = sanitize(req.body.name).trim();
+    var name = sanitize(req.body.name).trim()
+      , person_title = sanitize(req.body.person_title).trim()
+      , motto = sanitize(req.body.motto).trim();
 
     name = sanitize(name).xss();
+    person_title = sanitize(person_title).xss();
+    motto = sanitize(motto).xss();
 
     // 模版中缓存用户名密码
-    res.locals({ 'name': name });
+    res.locals({ 
+      'name': name,
+      'person_title': person_title,
+      'motto': motto
+    });
 
     //validator
     if(name == ''){
       req.flash('msg_alert', '昵称为空。');
       res.render('people/set');
-			return;
+      return;
     }
 
     try{
@@ -106,13 +129,31 @@ exports.set = function(req, res, next){
     catch(error){
       req.flash('msg_error', error.message);
       res.render('people/set');
-			return;
+      return;
+    }
+
+    try{
+      check(person_title, '头衔长度为2~20个字符。').len(0, 20);
+    }
+    catch(error){
+      req.flash('msg_error', error.message);
+      res.render('people/set');
+      return;
+    }
+
+    try{
+      check(name, '个性签名长度为200个字符以内。').len(0, 200);
+    }
+    catch(error){
+      req.flash('msg_error', error.message);
+      res.render('people/set');
+      return;
     }
 
 
     Person.findOne({ 'name': name }, function(err, person){
       if(err) return next(err);
-      if(person){
+      if(name != session_person.name && person){
         req.flash('msg_error', '新昵称已被占用。');
         res.render('people/set');
         return;
@@ -121,9 +162,14 @@ exports.set = function(req, res, next){
       Person.findById(session_person._id, function(err, person){
 
         person.name = name;
+        person.title = person_title;
+        person.motto = motto;
 
         person.save(function(err){
           session_person.name = person.name;
+          session_person.title = person.title;
+          session_person.motto = person.motto;
+          
           req.flash('msg_success', '昵称修改成功！');
           res.redirect('/profile');
         });
@@ -170,13 +216,13 @@ exports.set_password = function(req, res, next){
     if(passwd == '' || new_passwd == '' || new_passwd2 == ''){
       req.flash('msg_alert', '密码、新密码或确认密码为空。');
       res.render('people/set_password');
-			return;
+      return;
     }
 
     if(new_passwd != new_passwd2){
       req.flash('msg_alert', '新密码和确认密码不匹配。');
       res.render('people/set_password');
-			return;
+      return;
     }
 
     try{
@@ -186,7 +232,7 @@ exports.set_password = function(req, res, next){
     catch(error){
       req.flash('msg_error', error.message);
       res.render('people/set_password');
-			return;
+      return;
     }
 
     var session_person = req.session.person;

@@ -15,6 +15,7 @@ include ../includes/messages
           th 邮箱
           th 名称
           th 日期
+          th 激活
           th 操作
       tbody
         - each person in people
@@ -22,6 +23,11 @@ include ../includes/messages
             td= person.email
             td= person.name
             td= person.timestamp.less
+            td
+              - if(person.active)
+                input(type='checkbox', name='active', data-href='/people/#{person._id}/set_active', autocomplete='off', checked='checked').person-active-action
+              - else
+                input(type='checkbox', name='active', data-href='/people/#{person._id}/set_active', autocomplete='off').person-active-action
             td
               a(href='/people/#{person._id}/delete').person-destroy-action
                 i.icon-remove

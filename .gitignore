@@ -8,3 +8,5 @@ Thumbs.db
 /public/uploads/
 /tmp/
 config.js
+server.sh
+

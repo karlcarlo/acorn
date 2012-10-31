@@ -29,6 +29,21 @@ include ../includes/messages
               i.icon-user
             input(type='text', name='name', value=locals.name).span3
           p.help-block 长度控制在2~20个字符
+      .control-group
+        label.control-label
+          strong 头衔
+        .controls
+          .input-prepend
+            span.add-on
+              i.icon-briefcase
+            input(type='text', name='person_title', value=locals.person_title).span3
+          p.help-block 例如前端开发、交互设计、用户研究、视觉设计、JS开发、页面构建、前端架构等
+      .control-group
+        label.control-label
+          strong 签名
+        .controls
+          textarea(name='motto', rows='2').span4= locals.motto
+          p.help-block 个性签名内容为200个字符以内
 
       .form-actions
         button(type='submit').btn.btn-primary

@@ -9,7 +9,7 @@ require(['jquery', 'app/post_url'], function($, post_url){
     $('a.person-destroy-action').bind('click', function(event){
       event.preventDefault();
 
-      // É¾³ý±êÇ©
+      // åˆ é™¤æ ‡ç­¾
       post_url({
         action: this.href,
         method: 'delete'

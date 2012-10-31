@@ -1,7 +1,7 @@
 var config = require('../config').config;
 
-var models = require('../models'),
-	Topic = models.Topic;
+var models = require('../models')
+  , Topic = models.Topic;
 
 var controllers;
 

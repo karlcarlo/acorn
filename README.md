@@ -3,6 +3,7 @@
 
 Acorn是一个轻量的Markdown博客，基于NodeJS、Express、MongoDB等构建，可以很方便的搭建个人博客站点。
 
+github: [Acorn](http://github.com/karlcarlo/acorn)
 
 安装 Install
 =====
@@ -12,7 +13,7 @@ Acorn是一个轻量的Markdown博客，基于NodeJS、Express、MongoDB等构�
 ###配置Acorn依赖###
 
     cd acorn
-    npm install ./
+    npm install
     cp config.simple.js config.js
 
 ###编辑config.js###
@@ -60,7 +61,7 @@ Acorn是一个轻量的Markdown博客，基于NodeJS、Express、MongoDB等构�
 版本
 =====
 
-目前最新版本为：v0.2.2
+目前最新版本为：v0.2.3
 
 
 意见和反馈

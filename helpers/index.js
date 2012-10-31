@@ -15,7 +15,7 @@ exports.format_date = function(d){
     return (num < 10)? '0' + num : num.toString();
   }
 
-	var year = d.getFullYear()
+  var year = d.getFullYear()
     , month = d.getMonth() + 1
     , date = d.getDate()
     , day = d.getDay()
@@ -79,7 +79,7 @@ var brief = ''
   , link_ref = '';
 
 // 切分链接引用
-var slice_at = text.search(/\n *\[\d{0,3}\]: (http:\/\/)/);
+var slice_at = text.search(/\n *\[\d{0,3}\]: ((http|https|ftp):\/\/)/);
 if(slice_at != -1){
   link_ref = text.substring(slice_at, text.length);
   brief = text.substr(0, slice_at);
@@ -105,8 +105,7 @@ exports.brief_filter = function(str){
   str = str
     .replace(/&/g, '&amp;')
     .replace(/\</g, '&lt;')
-    .replace(/\>/g, '&gt;')
-    .replace(/\n/g, '<br>');
+    .replace(/\>/g, '&gt;');
   return str;
 };
 

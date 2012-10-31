@@ -2,10 +2,10 @@ var crypto = require('crypto'),
   config = require('../config').config;
 
 var check = require('validator').check,
-	sanitize = require('validator').sanitize;
+  sanitize = require('validator').sanitize;
 
 var models = require('../models'),
-	Person = models.Person;
+  Person = models.Person;
 
 var controllers;
 
@@ -19,7 +19,7 @@ exports.signin = function(req, res, next){
   // 使用空白模版
   res.local('layout', 'layouts/blank');
 
-	var method = req.method.toLowerCase();
+  var method = req.method.toLowerCase();
   if(method == 'get'){
     res.render('auth/signin');
     return;
@@ -37,30 +37,36 @@ exports.signin = function(req, res, next){
     if(email == '' || passwd == ''){
       req.flash('msg_alert', '邮件或密码为空。');
       res.render('auth/signin');
-			return;
+      return;
     }
 
     try{
-      check(email).len(6, 20).isEmail();
+      check(email).len(6, 40).isEmail();
     }
     catch(error){
       req.flash('msg_error', '邮件格式有误。');
       res.render('auth/signin');
-			return;
+      return;
     }
 
     Person.findOne({email: email}, function(err, person){
-			if(!person){
+      if(!person){
         req.flash('msg_error', '这个用户不存在。');
-				res.render('auth/signin');
-				return;
-			}
+        res.render('auth/signin');
+        return;
+      }
+
+      if(!person.active){
+        req.flash('msg_error', '用户被冻结或未激活。');
+        res.render('auth/signin');
+        return;
+      }
 
       var encrypted_passwd = encrypted_password(passwd, person.salt);
       if(person.hashed_password != encrypted_passwd){
         req.flash('msg_error', '用户名或密码有误。');
         res.render('auth/signin');
-				return;
+        return;
       }
 
       // 存储用户对象到Session
@@ -107,7 +113,7 @@ exports.signup = function(req, res, next){
     if(email == '' || passwd == '' || name == ''){
       req.flash('msg_alert', '邮件、密码或昵称为空。');
       res.render('auth/signup');
-			return;
+      return;
     }
 
     try{
@@ -116,7 +122,7 @@ exports.signup = function(req, res, next){
     catch(error){
       req.flash('msg_error', error.message);
       res.render('auth/signup');
-			return;
+      return;
     }
 
     try{
@@ -125,7 +131,7 @@ exports.signup = function(req, res, next){
     catch(error){
       req.flash('msg_error', error.message);
       res.render('auth/signup');
-			return;
+      return;
     }
 
     try{
@@ -134,7 +140,7 @@ exports.signup = function(req, res, next){
     catch(error){
       req.flash('msg_error', error.message);
       res.render('auth/signup');
-			return;
+      return;
     }
 
     Person.findOne({'$or': [{'name':name}, {'email':email}]}, function(err, person){
@@ -151,8 +157,8 @@ exports.signup = function(req, res, next){
       person.hashed_password = encrypted_password(passwd, person.salt);
       person.name = name;
 
-			// default: '/images/icon_avatar.png'
-			var avatar = 'http://www.gravatar.com/avatar/' + crypto.createHash('md5').update(email).digest('hex') + '?size=48';
+      // default: '/images/icon_avatar.png'
+      var avatar = 'http://cn.gravatar.com/avatar/' + crypto.createHash('md5').update(email).digest('hex') + '?size=48';
 
       person.avatar = avatar;
       
@@ -232,6 +238,6 @@ function create_salt(){
 }
 
 function session_init(person, res){
-	var auth_token = helpers.encrypt(person._id + '|'+person.name + '|' + person.hashed_password +'|' + person.email, config.session.secret);
-	res.cookie(config.cookie.name, auth_token, {path: '/', maxAge: 1000*60*60*24*14});		
+  var auth_token = helpers.encrypt(person._id + '|'+person.name + '|' + person.hashed_password +'|' + person.email, config.session.secret);
+  res.cookie(config.cookie.name, auth_token, {path: '/', maxAge: 1000*60*60*24*14});    
 }

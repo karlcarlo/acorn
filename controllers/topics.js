@@ -12,7 +12,8 @@ var controllers;
 
 var helpers = require('../helpers');
 
-var fs = require('fs');
+var fs = require('fs')
+  , path = require('path');
 
 var markdown = require('node-markdown').Markdown;
 
@@ -250,7 +251,7 @@ exports.create = function(req, res, next){
     catch(error){
       req.flash('msg_error', error.message);
       res.render('topics/edit', { tags: tags });
-			return;
+      return;
     }
 
     var topic = new Topic();
@@ -303,7 +304,7 @@ exports.create = function(req, res, next){
                 asset.type = file.type;
                 asset.size = file.size;
                 asset.path = '/uploads/' + filename;
-                asset.url = config.application.host + 'uploads/' + filename;
+                asset.url = path.join(config.application.host, '/uploads/', filename);
 
                 asset.save(function(err){
                   topic.topimg = asset.url;
@@ -418,6 +419,7 @@ exports.update = function(req, res, next){
     , content = sanitize(req.body.content).trim()
     , permission = req.body.permission
     , is_elite = req.body.is_elite
+    , is_elite_modified = false
     , tag_ids = req.body.tags || [];
 
   // 强制转换为数组
@@ -491,26 +493,116 @@ exports.update = function(req, res, next){
         return;
       }
 
-      /*
-       * 从旧标签序列中更新当前标签状态
-       * 由于Mongoose的嵌入文档保存机制不支持删除和添加同时保存，所以分两次保存Topic
-       */
-      // 清除旧标签并更新
-      topic.tags.splice(0, topic.tags.length);
-      topic.save(function(err){
-        if(err){
-          next(err);
+
+      var old_is_elite = topic.is_elite;
+      var file = req.files.topimg;
+      
+      // 分享到首页项是否被修改
+      if(old_is_elite !== !!is_elite){
+        is_elite_modified = true;
+      }else if(is_elite && file && file.size != 0){
+        is_elite_modified = true;
+      }
+
+      // 验证 分享到首页
+      if(is_elite && is_elite_modified){
+        
+        topic.is_elite = true;
+        
+        
+        if(file){
+          if(file.name == '' || file.size == 0){
+            req.flash('msg_alert', '分享到首页展示时，话题头图不能为空。');
+            res.render('topics/edit', { topic: topic, tags: tags });
+            return;
+          }
+
+          var name = file.name
+            , filename = +new Date + '_' + file.filename
+            , temp_path = file.path
+            , file_path = './public/uploads/' + filename;
+
+            fs.rename(temp_path, file_path, function(err){
+              if(err) throw err;
+              fs.unlink(temp_path, function(){
+
+                var asset = new Asset();
+                asset.name = name;
+                asset.filename = filename;
+                asset.type = file.type;
+                asset.size = file.size;
+                asset.path = '/uploads/' + filename;
+                asset.url = config.application.host + 'uploads/' + filename;
+
+                asset.save(function(err){
+                  topic.topimg = asset.url;
+
+
+                  // 保存话题
+                  /*
+                   * 从旧标签序列中更新当前标签状态
+                   * 由于Mongoose的嵌入文档保存机制不支持删除和添加同时保存，所以分两次保存Topic
+                   */
+                  // 清除旧标签并更新
+                  topic.tags.splice(0, topic.tags.length);
+                  topic.save(function(err){
+                    if(err){
+                      next(err);
+                    }
+                    // 添加新标签
+                    topic.tags.$pushAll(tag_ids);
+                    topic.save(function(err){
+                      if(err){
+                        next(err);
+                      }
+                      req.flash('msg_success', '话题已经更新。');
+                      res.redirect('/topics/' + topic.id);
+                    });
+                  });
+                  
+                });
+              });
+            });
+
         }
-        // 添加新标签
-        topic.tags.$pushAll(tag_ids);
+        else{
+          req.flash('msg_alert', '分享到首页展示时，话题头图不能为空。');
+          res.render('topics/edit', { topic: topic, tags: tags });
+          return;
+        }
+      }
+      else{
+        
+        if(is_elite_modified){
+          topic.is_elite = false;
+          topic.topimg = '';
+        }
+        
+        // 保存话题
+
+        /*
+         * 从旧标签序列中更新当前标签状态
+         * 由于Mongoose的嵌入文档保存机制不支持删除和添加同时保存，所以分两次保存Topic
+         */
+        // 清除旧标签并更新
+        topic.tags.splice(0, topic.tags.length);
         topic.save(function(err){
           if(err){
             next(err);
           }
-          req.flash('msg_success', '话题已经更新。');
-          res.redirect('/topics/' + topic.id);
+          // 添加新标签
+          topic.tags.$pushAll(tag_ids);
+          topic.save(function(err){
+            if(err){
+              next(err);
+            }
+            req.flash('msg_success', '话题已经更新。');
+            res.redirect('/topics/' + topic.id);
+          });
         });
-      });
+
+      }
+
       
     });
 

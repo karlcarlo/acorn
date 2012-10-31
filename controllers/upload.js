@@ -1,7 +1,7 @@
 var config= require('../config').config;
 
 var check = require('validator').check,
-	sanitize = require('validator').sanitize;
+  sanitize = require('validator').sanitize;
 
 var models = require('../models'),
   Asset = models.Asset;
@@ -10,7 +10,8 @@ var controllers;
 
 var helpers = require('../helpers');
 
-var fs = require('fs');
+var fs = require('fs')
+  , path = require('path');
 
 exports.upload = function(req, res, next){
 
@@ -54,7 +55,7 @@ exports.upload = function(req, res, next){
             asset.type = file.type;
             asset.size = file.size;
             asset.path = '/uploads/' + filename;
-            asset.url = config.application.host + 'uploads/' + filename;
+            asset.url = path.join(config.application.host, '/uploads/', filename);
 
             asset.save(function(err){
               res_obj.file = asset;

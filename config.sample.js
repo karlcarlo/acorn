@@ -1,8 +1,9 @@
 exports.config = {
   application: {
-    version: 'v0.2.2',
+    version: 'v0.2.3',
+    title: "Acorn Blog",
     name: "Acorn",
-    host: 'http://127.0.0.1/',
+    host: '', // http://127.0.0.1/
     port: 3000,
     root_account: 'root@localhost'
   },

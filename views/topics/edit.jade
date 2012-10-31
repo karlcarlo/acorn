@@ -93,9 +93,21 @@ form(action='#{form_action}', method='post', enctype='multipart/form-data').topi
         - else
           input(type='checkbox', name='is_elite')#share2home.inline
         strong 分享到首页展示
-      span(style='display: none;')#share2home_file.topimg
-        input(type='file', name='topimg').inline
-        span.help-inline 话题头图尺寸(宽*高): 780px * 240px
+    - if(action=="edit" && topic.is_elite || locals.topic_is_elite)
+      .controls#share2home_file
+        - if(locals.topic && topic.topimg)
+          div.preview-topimg
+            img(src=topic.topimg, height='240')
+        div.topimg
+          input(type='file', name='topimg').inline
+          span.help-inline 话题头图尺寸(宽*高): 780px * 240px
+    - else
+      .controls(style='display: none;')#share2home_file
+        div.topimg
+          input(type='file', name='topimg').inline
+          span.help-inline 话题头图尺寸(宽*高): 780px * 240px
+      
+      
 
   .form-actions
     - if(action=="edit")

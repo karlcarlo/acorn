@@ -4,7 +4,8 @@ define(['jquery'], function($){
     var settings = $.extend({
       action: '',
       method: 'post',
-      callback: null
+      callback: null,
+      param: null
     }, options || {});
 
     if(settings.action == ''){
@@ -13,11 +14,21 @@ define(['jquery'], function($){
 
     var form = [
       '<form action="', settings.action, '" method="', (settings.method == 'get'? 'get' : 'post'), '">',
-      '<input type="hidden" name="_method" value="', settings.method, '">',
-      '</form>'
-    ].join('');
+      '<input type="hidden" name="_method" value="', settings.method, '">'
+    ];
+    
+    if(settings.param){
+      var param = settings.param;
+      for(key in param){
+        if(param.hasOwnProperty(key)){
+          form.push('<input type="hidden" name="' + key + '" value="' + param[key] + '">');
+        }
+      }
+    }
+    
+    form.push('</form>');
 
-    var $form = $(form);
+    var $form = $(form.join(''));
 
     $('body').append($form);
 
