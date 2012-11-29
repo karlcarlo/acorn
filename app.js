@@ -6,7 +6,10 @@ var express = require('express')
   , routes = require('./routes')
   , markdown = require('node-markdown').Markdown
   , path = require('path')
-  , config = require('./config').config;
+  , config = require('./config').config
+  , fs = require('fs')
+  , access_log = fs.createWriteStream('./logs/access.log', {flags: 'a'})
+  , error_log = fs.createWriteStream('./logs/error.log', {flags: 'a'});
 
 var helpers = require('./helpers');
 
@@ -30,6 +33,9 @@ app.configure(function(){
   app.set('view options', {
     layout: 'layouts/layout'
   });
+  
+  app.use(express.logger({stream: access_log}));
+  
   //app.use(express.compiler({ src: __dirname + '/public/stylesheets', enable: ['less'] }));
 	app.use(express.cookieParser());
 	app.use(express.session({
@@ -53,11 +59,16 @@ app.configure('production', function(){
 	var one_year = 365 * 24 * 60 * 60 * 1000;
 	app.set('view cache', true);
 	app.use(express.static(__dirname + '/public', { maxAge: one_year }));
-	app.use(express.errorHandler()); 
+  //app.use(express.errorHandler());
+  app.error(function(err, req, res, next){
+    var meta = '[' + new Date() + '] ' + req.url + '\n';
+    error_log.write(meta + err.stack + '\n');
+    next();
+  });
 });
 
 app.helpers({
-  title: 'Acorn Blog',
+  title: config.application.title,
   version: config.application.version
 });
 
@@ -88,6 +99,7 @@ app.post('/set', routes.people_set);
 app.get('/set_password', routes.people_set_password);
 app.post('/set_password', routes.people_set_password);
 app.del('/people/:id/delete', routes.people_destroy);
+app.put('/people/:id/set_active', routes.people_set_active);
 
 // Upload
 app.post('/upload', routes.upload);

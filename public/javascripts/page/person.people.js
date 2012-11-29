@@ -16,5 +16,22 @@ require(['jquery', 'app/post_url'], function($, post_url){
       });
     });
 
+    
+    // 设置激活状态
+    $('input.person-active-action').bind('change', function(event){
+      event.preventDefault();
+
+      // 冻结或激活用户状态
+      post_url({
+        action: $(this).attr('data-href'),
+        method: 'put',
+        param: {
+          active: this.checked
+        }
+      });
+    });
+    
+    
+
   });
 });

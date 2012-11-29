@@ -284,6 +284,39 @@ exports.destroy = function(req, res){
   
 };
 
+/*
+
+ * PUT /people/:id/set_active
+ */
+exports.set_active = function(req, res){
+
+  if(!req.session.person || !req.session.person.is_root){
+    req.flash('msg_alert', '您没有操作权限。');
+    res.redirect('/notify');
+    return;
+  }
+
+  var person_id = req.params.id
+    , active = sanitize(req.body.active).trim();
+  
+  
+  Person
+  .findById(person_id)
+  .run(function(err, person){
+  
+    person.active = (active.toString().toLowerCase() === 'true')? true : false;
+    
+    person
+    .save(function(err){
+      req.flash('msg_success', '用户激活状态已成功修改。');
+      res.redirect('/people');
+    });
+    
+  
+  });
+    
+};
+
 
 
 // private functions

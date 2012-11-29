@@ -3,13 +3,13 @@
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
-      "express": "2.x"
+      "express": "2.5.x"
     , "jade": ">= 0.0.1"
     , "node-markdown": ">= 0.1.0"
-    , "mongoose": "2.x"
+    , "mongoose": ">= 2.5.7"
     , "validator": ">= 0.4.2"
     , "less": ">= 1.2.2"
-    , "eventproxy": ">= 0.1.4"
+    , "async": "*"
   }
   , "devDependencies": {
       "api-easy": "0.3.x"

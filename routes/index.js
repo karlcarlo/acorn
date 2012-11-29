@@ -28,6 +28,7 @@ exports.people_profile = people_controller.profile;
 exports.people_set = people_controller.set;
 exports.people_set_password = people_controller.set_password;
 exports.people_destroy = people_controller.destroy;
+exports.people_set_active = people_controller.set_active;
 
 // upload
 exports.upload = upload_controller.upload;
