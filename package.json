@@ -6,7 +6,7 @@
       "express": "2.5.x"
     , "jade": ">= 0.0.1"
     , "node-markdown": ">= 0.1.0"
-    , "mongoose": ">= 2.5.7"
+    , "mongoose": "2.5.x"
     , "validator": ">= 0.4.2"
     , "less": ">= 1.2.2"
     , "async": "*"
