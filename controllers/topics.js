@@ -246,7 +246,7 @@ exports.create = function(req, res, next){
 
     // 验证标题格式
     try{
-      check(title, '标题为5~50个字。').len(5, 50);
+      check(title, '标题为5~100个字。').len(5, 100);
     }
     catch(error){
       req.flash('msg_error', error.message);
