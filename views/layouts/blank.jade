@@ -9,5 +9,6 @@ html
     include ../includes/topbar
     header.header
       include ../includes/header_topnav
-    .container!= body
+    .container
+      block content
     include ../includes/footer

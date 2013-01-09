@@ -12,7 +12,8 @@ html
       include ../includes/header_topnav
     .container
       .row
-        .span9!= body
+        .span9
+          block content
         .span3.sidebar
           include ../includes/sidebar
     include ../includes/footer

@@ -10,5 +10,6 @@ html
     header.header
       include ../includes/header_topimg
       include ../includes/header_topnav
-    .container!= body
+    .container
+      block content
     include ../includes/footer
