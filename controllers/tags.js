@@ -1,20 +1,49 @@
-var check = require('validator').check,
-	sanitize = require('validator').sanitize;
+var check = require('validator').check
+  , sanitize = require('validator').sanitize;
 
-var models = require('../models'),
-  Person = models.Person,
-  Topic = models.Topic,
-  Tag = models.Tag;
+var models = require('../models')
+  , Person = models.Person
+  , Topic = models.Topic
+  , Tag = models.Tag;
 
 var controllers;
 
 var helpers = require('../helpers');
 
+var words = {
+  name: '标签',
+  new: '新增',
+  create: '创建',
+  edit: '编辑',
+  update: '更新',
+  destroy: '删除',
+  no_login: '您还未登录，不能进行当前操作。',
+  no_exist: '此标签不存在或已被删除。',
+  permission_denied: '您没有操作权限。',
+  empty_name: '名称不能为空。',
+  success_create: '新标签已经保存，请继续添加。',
+  success_update: '标签已经更新！',
+  success_destroy: '标签已经成功删除。'
+}
+
 exports.index = function(req, res, next){
 
+  // 分页对象
+  var pagination = {
+    max_items: 0,
+    max_pages:0,
+    items_per_page: 20,
+    link_to: '/topics',
+    prev_page: 0,
+    next_page: 0,
+    current_page: 0
+  };
+
+  res.locals.pagination = pagination;
+
   Tag
-  .find({}, ['_id', 'name', 'description', 'sequence'], { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
-  .run(function(err, tags){
+  .find({}, '_id name description sequence', { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .exec(function(err, tags){
 
     if(req.params.format && req.params.format == 'json'){
       var res_obj = {
@@ -28,11 +57,7 @@ exports.index = function(req, res, next){
       return;
     }
     else{
-      res.locals({
-        tags: tags,
-        layout: 'layouts/person'
-      });
-      res.render('tags/index');
+      res.render('tags/index', { tags: tags });
     }
 
 
@@ -49,16 +74,16 @@ exports.index = function(req, res, next){
 exports.new = function(req, res){
 
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.no_login });
     res.redirect('/notify');
     return;
   }
 
   res.locals({
-    title: '新建标签',
+    title: words.new + words.name,
     action: 'new',
     form_action: '/tags',
-    layout: 'layouts/person'
+    tag: {}
   });
 
   res.render('tags/edit');
@@ -70,7 +95,7 @@ exports.new = function(req, res){
 exports.create = function(req, res){
   
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -82,18 +107,19 @@ exports.create = function(req, res){
     , sequence = sanitize(req.body.sequence).trim();
 
   res.locals({
-    title: '新建标签',
+    title: words.new + words.name,
     action: 'new',
     form_action: '/tags',
-    tag_name: name,
-    tag_description: description,
-    tag_sequence: sequence,
-    layout: 'layouts/person'
+    tag: {
+      name: name,
+      description: description,
+      sequence: sequence
+    }
   });
 
   // 验证名称或描述是否为空
-  if(name == '' || description == ''){
-    req.flash('msg_alert', '名称或描述不能为空。');
+  if(name == ''){
+    res.app.locals.messages.push({ type: 'alert', content: words.empty_name });
     res.render('tags/edit');
     return;
   }
@@ -103,18 +129,28 @@ exports.create = function(req, res){
     check(name, '名称为2~20个字。').len(2, 20);
   }
   catch(error){
-    req.flash('msg_error', error.message);
+    res.app.locals.messages.push({ type: 'error', content: error.message });
+    res.render('tags/edit');
+    return;
+  }
+
+  // 验证描述格式
+  try{
+    check(description, '描述最多为50个字。').len(0, 50);
+  }
+  catch(error){
+    res.app.locals.messages.push({ type: 'error', content: error.message });
     res.render('tags/edit');
     return;
   }
 
   //保存标签对象
   tag.name = name;
-  tag.description = description;
+  tag.description = description || name;
   tag.sequence = sequence || 0;
 
   tag.save(function(err){
-    req.flash('msg_success', '新标签已经保存，请继续添加。');
+    res.app.locals.messages.push({ type: 'success', content: words.success_create });
     res.redirect('/tags');
   });
   
@@ -126,7 +162,7 @@ exports.create = function(req, res){
 exports.edit = function(req, res){
   
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -134,15 +170,14 @@ exports.edit = function(req, res){
   var tag_id = req.params.id;
 
   res.locals({
-    title: '修改标签',
+    title: words.edit + words.name,
     action: 'edit',
-    form_action: '/tags/' + tag_id,
-    layout: 'layouts/person'
+    form_action: '/tags/' + tag_id
   });
   
   Tag
   .findById(tag_id)
-  .run(function(err, tag){
+  .exec(function(err, tag){
     res.render('tags/edit', { tag: tag });
   });
 };
@@ -152,13 +187,13 @@ exports.edit = function(req, res){
  */
 exports.update = function(req, res){
   if(!req.session.person){
-    req.flash('msg_alert', '您还未登录，不能编辑标签。');
+    res.app.locals.messages.push({ type: 'alert', content: words.no_login });
     res.redirect('/signin');
     return;
   }
 
   if(!req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -169,10 +204,9 @@ exports.update = function(req, res){
     , sequence = sanitize(req.body.sequence).trim();
 
   res.locals({
-    title: '修改标签',
+    title: words.edit + words.name,
     action: 'edit',
-    form_action: '/tags/' + tag_id,
-    layout: 'layouts/person'
+    form_action: '/tags/' + tag_id
   });
 
   Tag.findById(tag_id, function(err, tag){
@@ -183,7 +217,7 @@ exports.update = function(req, res){
 
     // 验证名称或描述是否为空
     if(name == '' || description == ''){
-      req.flash('msg_alert', '名称或描述不能为空。');
+      res.app.locals.messages.push({ type: 'alert', content: words.empty_name });
       res.render('tags/edit', { tag: tag });
       return;
     }
@@ -193,14 +227,14 @@ exports.update = function(req, res){
       check(name, '名称为2~20个字。').len(2, 20);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({ type: 'error', content: error.message });
       res.render('tags/edit', { tag: tag });
 			return;
     }
 
     tag.save(function(err){
-      req.flash('msg_success', '标签已经更新。');
-      res.render('tags', { tag: tag });
+      res.app.locals.messages.push({ type: 'success', content: words.success_update });
+      res.redirect('/tags');
     });
 
   });
@@ -213,7 +247,7 @@ exports.update = function(req, res){
 exports.destroy = function(req, res){
 
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -222,7 +256,7 @@ exports.destroy = function(req, res){
 
   Tag
   .remove({_id: tag_id}, function(err){
-    req.flash('msg_success', '标签已经成功删除。');
+    res.app.locals.messages.push({ type: 'success', content: words.success_destroy });
     res.redirect('/tags');
   });
   
