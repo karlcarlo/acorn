@@ -17,7 +17,7 @@ define(['jquery'], function($){
             , topics = json.topics;
 
           for(var i = 0; i < topics.length; i++){
-            str.push('<a href="/topics/' + topics[i]._id + '" title="' + topics[i].description + '">' + topics[i].name + '</a>');
+            str.push('<a href="/topics/' + topics[i]._id + '" title="' + topics[i].author.name + '">' + topics[i].title + '</a>');
           }
 
           $container.html(str.join(''));
