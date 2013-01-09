@@ -12,6 +12,28 @@ var controllers;
 
 var helpers = require('../helpers');
 
+var words = {
+  name: '用户',
+  new: '新增',
+  create: '创建',
+  edit: '编辑',
+  update: '更新',
+  destroy: '删除',
+  no_login: '您还未登录，不能进行当前操作。',
+  no_exist: '此用户不存在或已被删除。',
+  no_match_password: '新密码和确认密码不匹配。',
+  is_exist_name: '新昵称已被占用。',
+  permission_denied: '您没有操作权限。',
+  error_password: '旧密码验证有误。',
+  empty_name: '昵称为空。',
+  empty_password: '密码、新密码或确认密码为空。',
+  success_create: '新用户创建成功！',
+  success_update_name: '昵称修改成功！',
+  success_update_password: '密码修改成功！',
+  success_update_active: '用户激活状态已成功修改。',
+  success_destroy: '用户已经成功删除。'
+}
+
 /*
  * people controller
  */
@@ -26,7 +48,7 @@ exports.index = function(req, res, next){
     
     Person
     .find({ active: true }, ['_id', 'name', 'email', 'avatar', 'title', 'motto', 'duty', 'created_at'], { sort: [[ 'created_at', 'asc' ]] })
-    .run(function(err, people){
+    .exec(function(err, people){
       res_obj.people = people;
       res.json(res_obj);
     });
@@ -34,18 +56,17 @@ exports.index = function(req, res, next){
   else{
     
     if(!req.session.person || !req.session.person.is_root){
-      req.flash('msg_alert', '您没有操作权限。');
+      res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
       res.redirect('/notify');
       return;
     }
     
     Person
     .find({}, null, { sort: [[ 'created_at', 'desc' ]] })
-    .run(function(err, people){
+    .exec(function(err, people){
 
       res.locals({
-        people: people,
-        layout: 'layouts/person'
+        people: people
       });
       
       res.render('people/index');
@@ -56,7 +77,7 @@ exports.index = function(req, res, next){
 
 exports.profile = function(req, res, next){
   if(!req.session.person){
-    req.flash('msg_alert', '您还未登录，不能进行当前操作。');
+    res.app.locals.messages.push({ type: 'alert', content: words.no_login });
     res.redirect('/signin');
     return;
   }
@@ -66,17 +87,16 @@ exports.profile = function(req, res, next){
   .populate('author')
   .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
   .limit(10)
-  .run(function(err, topics){
-    res.local('topics', topics);
-
-    res.render('people/profile', { layout: 'layouts/person' });
+  .exec(function(err, topics){
+    res.locals.topics = topics;
+    res.render('people/profile');
 
   });
 };
 
 exports.set = function(req, res, next){
   if(!req.session.person){
-    req.flash('msg_alert', '您还未登录，不能进行设置操作。');
+    res.app.locals.messages.push({type: 'success', content: words.no_login});
     res.redirect('/signin');
     return;
   }
@@ -85,8 +105,7 @@ exports.set = function(req, res, next){
   var session_person = req.session.person;
 
   res.locals({
-    email: session_person.email,
-    layout: 'layouts/person'
+    email: session_person.email
   })
 
   var method = req.method.toLowerCase();
@@ -118,7 +137,7 @@ exports.set = function(req, res, next){
 
     //validator
     if(name == ''){
-      req.flash('msg_alert', '昵称为空。');
+      res.app.locals.messages.push({type: 'alert', content: words.empty_name});
       res.render('people/set');
       return;
     }
@@ -127,7 +146,7 @@ exports.set = function(req, res, next){
       check(name, '昵称只能使用中文、英文和数字，长度为2~20个字符。').len(2, 20).is(/^[a-zA-Z0-9\u4e00-\u9fa5]+$/);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({ type: 'error', content: error.message });
       res.render('people/set');
       return;
     }
@@ -136,7 +155,7 @@ exports.set = function(req, res, next){
       check(person_title, '头衔长度为2~20个字符。').len(0, 20);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({ type: 'error', content: error.message });
       res.render('people/set');
       return;
     }
@@ -145,7 +164,7 @@ exports.set = function(req, res, next){
       check(name, '个性签名长度为200个字符以内。').len(0, 200);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({ type: 'error', content: error.message });
       res.render('people/set');
       return;
     }
@@ -154,7 +173,7 @@ exports.set = function(req, res, next){
     Person.findOne({ 'name': name }, function(err, person){
       if(err) return next(err);
       if(name != session_person.name && person){
-        req.flash('msg_error', '新昵称已被占用。');
+        res.app.locals.messages.push({ type: 'error', content: words.is_exist_name });
         res.render('people/set');
         return;
       }
@@ -170,7 +189,7 @@ exports.set = function(req, res, next){
           session_person.title = person.title;
           session_person.motto = person.motto;
           
-          req.flash('msg_success', '昵称修改成功！');
+          res.app.locals.messages.push({ type: 'success', content: words.success_update_name });
           res.redirect('/profile');
         });
 
@@ -184,14 +203,10 @@ exports.set = function(req, res, next){
 
 exports.set_password = function(req, res, next){
   if(!req.session.person){
-    req.flash('msg_alert', '您还未登录，不能进行设置操作。');
+    res.app.locals.messages.push({ type: 'alert', content: words.no_login });
     res.redirect('/signin');
     return;
   }
-
-  res.locals({
-    layout: 'layouts/person'
-  })
 
   var method = req.method.toLowerCase();
   if(method == 'get'){
@@ -214,13 +229,13 @@ exports.set_password = function(req, res, next){
 
     //validator
     if(passwd == '' || new_passwd == '' || new_passwd2 == ''){
-      req.flash('msg_alert', '密码、新密码或确认密码为空。');
+      res.app.locals.messages.push({ type: 'alert', content: words.empty_password });
       res.render('people/set_password');
       return;
     }
 
     if(new_passwd != new_passwd2){
-      req.flash('msg_alert', '新密码和确认密码不匹配。');
+      res.app.locals.messages.push({ type: 'error', content: words.no_match_password });
       res.render('people/set_password');
       return;
     }
@@ -230,7 +245,7 @@ exports.set_password = function(req, res, next){
       check(new_passwd, '新密码只能使用任意的非空白字符，长度为6~20个字符。').is(/^[\S]{6,20}$/);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({ type: 'error', content: error.message });
       res.render('people/set_password');
       return;
     }
@@ -239,7 +254,7 @@ exports.set_password = function(req, res, next){
 
     var encrypted_passwd = encrypted_password(passwd, session_person.salt);
     if(session_person.hashed_password != encrypted_passwd){
-      req.flash('msg_error', '旧密码验证有误。');
+      res.app.locals.messages.push({ type: 'error', content: words.error_password });
       res.render('people/set_password');
       return;
     }
@@ -252,7 +267,8 @@ exports.set_password = function(req, res, next){
       person.save(function(err){
         session_person.salt = person.salt;
         session_person.hashed_password = person.hashed_password;
-        req.flash('msg_success', '密码修改成功！');
+
+        res.app.locals.messages.push({ type: 'success', content: words.success_update_password });
         res.redirect('/profile');
       });
 
@@ -269,7 +285,7 @@ exports.set_password = function(req, res, next){
 exports.destroy = function(req, res){
 
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -278,7 +294,7 @@ exports.destroy = function(req, res){
 
   Person
   .remove({_id: person_id}, function(err){
-    req.flash('msg_success', '用户已经成功删除。');
+    res.app.locals.messages.push({ type: 'success', content: words.success_destroy });
     res.redirect('/people');
   });
   
@@ -291,7 +307,7 @@ exports.destroy = function(req, res){
 exports.set_active = function(req, res){
 
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -302,13 +318,13 @@ exports.set_active = function(req, res){
   
   Person
   .findById(person_id)
-  .run(function(err, person){
+  .exec(function(err, person){
   
     person.active = (active.toString().toLowerCase() === 'true')? true : false;
     
     person
     .save(function(err){
-      req.flash('msg_success', '用户激活状态已成功修改。');
+      res.app.locals.messages.push({ type: 'success', content: words.success_update_active });
       res.redirect('/people');
     });
     
