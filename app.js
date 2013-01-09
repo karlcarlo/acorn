@@ -4,84 +4,52 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , markdown = require('node-markdown').Markdown
+  , http = require('http')
   , path = require('path')
-  , config = require('./config')
   , fs = require('fs')
+  , markdown = require('node-markdown').Markdown
   , access_log = fs.createWriteStream('./logs/access.log', {flags: 'a'})
-  , error_log = fs.createWriteStream('./logs/error.log', {flags: 'a'});
+  , error_log = fs.createWriteStream('./logs/error.log', {flags: 'a'})
+
+var config = require('./config')
 
 var helpers = require('./helpers');
 
-var app = module.exports = express.createServer();
+var app = express();
 
-// Configuration
-app.register('.md', {
-  compile: function(str, options){
-    var html = markdown(str);
-    return function(locals){
-      return html.replace(/\{([^}]+)\}/g, function(_, name){
-        return locals[name];
-      });
-    };
-  }
-});
 
 app.configure(function(){
+  app.set('port', process.env.PORT || config.application.port);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.set('view options', {
     layout: 'layouts/layout'
   });
-  
   app.use(express.logger({stream: access_log}));
-  
-  //app.use(express.compiler({ src: __dirname + '/public/stylesheets', enable: ['less'] }));
-	app.use(express.cookieParser());
-	app.use(express.session({
-		secret: config.session.secret,
-	}));
-  app.use(express.static(__dirname + '/public'));
   app.use(express.bodyParser({ uploadDir: './tmp' }));
   app.use(express.methodOverride());
-
+  app.use(express.cookieParser(config.session.secret));
+  app.use(express.session({ secret: config.session.secret }));
   app.use(routes.auth_authenticate);
   app.use(app.router);
+  app.use(require('less-middleware')({ src: __dirname + '/public' }));
+  app.use(express.static(path.join(__dirname, 'public')));
 });
 
 
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler());
 });
 
-app.configure('production', function(){
-	var one_year = 365 * 24 * 60 * 60 * 1000;
-	app.set('view cache', true);
-	app.use(express.static(__dirname + '/public', { maxAge: one_year }));
-  //app.use(express.errorHandler());
-  app.error(function(err, req, res, next){
-    var meta = '[' + new Date() + '] ' + req.url + '\n';
-    error_log.write(meta + err.stack + '\n');
-    next();
-  });
-});
-
-app.helpers({
+app.locals({
   title: config.application.title,
-  version: config.application.version
-});
-
-app.dynamicHelpers({
-  messages: function(req, res){
-    return req.flash();
-  }
-});
+  version: config.application.version,
+  messages: []
+})
 
 // Routes
 app.get('/', routes.index);
-app.get('/stylesheets/:name.css', routes.less_css);
-app.get('/markdown/:title.:format', routes.md_html);
 app.get('/notify', routes.notify);
 
 // Auth
@@ -106,7 +74,7 @@ app.post('/upload', routes.upload);
 
 // Asset
 app.get('/assets.:format?', routes.assets_index);
-app.post('/assets/:id/delete', routes.assets_destroy);
+app.del('/assets/:id/delete', routes.assets_destroy);
 
 // Topic
 app.get('/topics.:format?', routes.topics_index);
@@ -122,7 +90,7 @@ app.get('/tags.:format?', routes.tags_index);
 app.get('/tags/new', routes.tags_new);
 app.get('/tags/:id/edit', routes.tags_edit);
 app.post('/tags', routes.tags_create);
-app.post('/tags/:id', routes.tags_update);
+app.put('/tags/:id', routes.tags_update);
 app.del('/tags/:id/delete', routes.tags_destroy);
 
 // Comment
@@ -140,5 +108,6 @@ app.get('*', function(req, res){
   });
 });
 
-app.listen(config.application.port);
-console.log("%s server listening on port %d in %s mode", config.application.name, config.application.port, app.settings.env);
+http.createServer(app).listen(app.get('port'), function(){
+  console.log("%s server listening on port %d in %s mode", config.application.name, app.get('port'), app.settings.env);
+});
