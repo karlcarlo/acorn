@@ -1,36 +1,40 @@
-include ../includes/messages
+extends ../layouts/person
 
-.row
-  .span2.sidebar
-    include ../includes/sidebar_person
-  .span10
-    .page-header
-      .pull-right
-        a(href='/tags/new').btn.btn-info 添加标签
-      h1 标签管理
-        | 
-        small 创建一个新标签
+block content
 
-    table.tags-list.table.table-condensed
-      thead
-        tr
-          th 名称
-          th 描述
-          th 序列
-          th 操作
-      tbody
-        - each tag in tags
+  include ../includes/messages
+
+  .row
+    .span2.sidebar
+      include ../includes/sidebar_person
+    .span10
+      .page-header
+        .pull-right
+          a(href='/tags/new').btn.btn-info 添加标签
+        h1 标签管理
+          | 
+          small 创建一个新标签
+
+      table.tags-list.table.table-condensed
+        thead
           tr
-            td
-              a(href='/tags/#{tag._id}/edit', title=tag.description)= tag.name
-            td= tag.description
-            td= tag.sequence
-            td
-              a(href='/tags/#{tag._id}/edit')
-                i.icon-edit
-              a(href='/tags/#{tag._id}/delete').tag-destroy-action
-                i.icon-remove
+            th 名称
+            th 描述
+            th 序列
+            th 操作
+        tbody
+          - each tag in tags
+            tr
+              td
+                a(href='/tags/#{tag._id}/edit', title=tag.description)= tag.name
+              td= tag.description
+              td= tag.sequence
+              td
+                a(href='/tags/#{tag._id}/edit')
+                  i.icon-edit
+                a(href='/tags/#{tag._id}/delete').tag-destroy-action
+                  i.icon-remove
 
 
-script
-  require(['/javascripts/page/person.tags.js']);
+  script
+    require(['/javascripts/page/person.tags.js']);

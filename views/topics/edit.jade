@@ -1,122 +1,126 @@
-.breadcrumb
-  li
-    a(href='/') 首页
-    span.divider /
-  li
-    a(href='/topics') 话题
-    span.divider /
-  li.active
-    | 编辑
+extends ../layouts/layout
 
-.page-header
-  .pull-right
-    a(href='/topics').btn.btn-info 返回列表
-  h1= title
-    | 
-    small 创建一个新话题
+block content
 
-include ../includes/messages
+  .breadcrumb
+    li
+      a(href='/') 首页
+      span.divider /
+    li
+      a(href='/topics') 话题
+      span.divider /
+    li.active
+      | 编辑
 
-form(action='#{form_action}', method='post', enctype='multipart/form-data').topic-edit.form-vertical
-  .control-group
-    label.control-label
-      strong 标题
-    .controls
-      textarea(name='title', rows='2').span9
-        - if(action=="edit")
-          | !{topic.title}
-        - else
-          | !{locals.topic_title}
-      p.help-block 建议使用中文来书写标题，字数控制在5~100个字
+  .page-header
+    .pull-right
+      a(href='/topics').btn.btn-info 返回列表
+    h1= title
+      | 
+      small 创建一个新话题
 
-  .control-group
-    label.control-label
-      strong 内容
-    .tabbable
-      ul.nav.nav-tabs
-        li.active
-          a(href='#markdown_editor', data-toggle='tab') 编辑
-        li
-          a(href='#markdown_preview', data-toggle='tab') 预览
-      .tab-content
-        #markdown_editor.tab-pane.controls.active
-          #wmd-button-bar
-          textarea(name='content', rows='15')#wmd-input.span9
-            - if(action=="edit")
-              | !{topic.content}
+  include ../includes/messages
+
+  form(action='#{form_action}', method='post', enctype='multipart/form-data').topic-edit.form-vertical
+    .control-group
+      label.control-label
+        strong 标题
+      .controls
+        textarea(name='title', rows='2').span9
+          - if(action=="edit")
+            | !{topic.title}
+          - else
+            | !{locals.topic_title}
+        p.help-block 建议使用中文来书写标题，字数控制在5~100个字
+
+    .control-group
+      label.control-label
+        strong 内容
+      .tabbable
+        ul.nav.nav-tabs
+          li.active
+            a(href='#markdown_editor', data-toggle='tab') 编辑
+          li
+            a(href='#markdown_preview', data-toggle='tab') 预览
+        .tab-content
+          #markdown_editor.tab-pane.controls.active
+            #wmd-button-bar
+            textarea(name='content', rows='15')#wmd-input.span9
+              - if(action=="edit")
+                | !{topic.content}
+              - else
+                | !{locals.topic_content}
+          #markdown_preview.tab-pane.controls
+            #wmd-preview.wmd-preview.topic-wmd-preview
+
+    .control-group
+      .tags-wrapper.clearfix
+        strong 选择标签
+        span.tags
+          - each tag in tags
+            - if(tag.is_checked)
+              label(title='#{tag.description}').tag.tag-checked
+                span.checkbox-wrapper
+                  input(name='tags', type='checkbox', value='#{tag._id}', checked)
+                span= tag.name
+            - else 
+              label(title='#{tag.description}').tag
+                span.checkbox-wrapper
+                  input(name='tags', type='checkbox', value='#{tag._id}')
+                span= tag.name
+
+    hr
+
+    .control-group
+      .controls
+        .permission-wrapper.clearfix
+          strong 权限设置
+          select(name='permission').input-small
+            - if(action=="edit" && topic.permission == 'public' || locals.topic_permission == 'public')
+              option(value='public', selected='selected') 公共访问
             - else
-              | !{locals.topic_content}
-        #markdown_preview.tab-pane.controls
-          #wmd-preview.wmd-preview.topic-wmd-preview
+              option(value='public') 公共访问
+            - if(action=="edit" && topic.permission == 'protect' || locals.topic_permission == 'protect')
+              option(value='protect', selected='selected') 用户访问
+            - else
+              option(value='protect') 用户访问
+            - if(action=="edit" && topic.permission == 'private' || locals.topic_permission == 'private')
+              option(value='private', selected='selected') 自己访问
+            - else
+              option(value='private') 自己访问
 
-  .control-group
-    .tags-wrapper.clearfix
-      strong 选择标签
-      span.tags
-        - each tag in tags
-          - if(tag.is_checked)
-            label(title='#{tag.description}').tag.tag-checked
-              span.checkbox-wrapper
-                input(name='tags', type='checkbox', value='#{tag._id}', checked)
-              span= tag.name
-          - else 
-            label(title='#{tag.description}').tag
-              span.checkbox-wrapper
-                input(name='tags', type='checkbox', value='#{tag._id}')
-              span= tag.name
-
-  hr
-
-  .control-group
-    .controls
-      .permission-wrapper.clearfix
-        strong 权限设置
-        select(name='permission').input-small
-          - if(action=="edit" && topic.permission == 'public' || locals.topic_permission == 'public')
-            option(value='public', selected='selected') 公共访问
+    .control-group
+      .controls
+        label.checkbox
+          - if(action=="edit" && topic.is_elite || locals.topic_is_elite)
+            input(type='checkbox', name='is_elite', checked='checked')#share2home.inline
           - else
-            option(value='public') 公共访问
-          - if(action=="edit" && topic.permission == 'protect' || locals.topic_permission == 'protect')
-            option(value='protect', selected='selected') 用户访问
-          - else
-            option(value='protect') 用户访问
-          - if(action=="edit" && topic.permission == 'private' || locals.topic_permission == 'private')
-            option(value='private', selected='selected') 自己访问
-          - else
-            option(value='private') 自己访问
-
-  .control-group
-    .controls
-      label.checkbox
-        - if(action=="edit" && topic.is_elite || locals.topic_is_elite)
-          input(type='checkbox', name='is_elite', checked='checked')#share2home.inline
-        - else
-          input(type='checkbox', name='is_elite')#share2home.inline
-        strong 分享到首页展示
-    - if(action=="edit" && topic.is_elite || locals.topic_is_elite)
-      .controls#share2home_file
-        - if(locals.topic && topic.topimg)
-          div.preview-topimg
-            img(src=topic.topimg, height='240')
-        div.topimg
-          input(type='file', name='topimg').inline
-          span.help-inline 话题头图尺寸(宽*高): 780px * 240px
-    - else
-      .controls(style='display: none;')#share2home_file
-        div.topimg
-          input(type='file', name='topimg').inline
-          span.help-inline 话题头图尺寸(宽*高): 780px * 240px
-      
-      
-
-  .form-actions
-    - if(action=="edit")
-      input(type='hidden', name='topic_id', value='#{topic.id}')
-    button(type='submit').btn.btn-primary
-      - if(action=="new")
-        | 确认提交，发布
+            input(type='checkbox', name='is_elite')#share2home.inline
+          strong 分享到首页展示
+      - if(action=="edit" && topic.is_elite || locals.topic_is_elite)
+        .controls#share2home_file
+          - if(locals.topic && topic.topimg)
+            div.preview-topimg
+              img(src=topic.topimg, height='240')
+          div.topimg
+            input(type='file', name='topimg').inline
+            span.help-inline 话题头图尺寸(宽*高): 780px * 240px
       - else
-        | 确认修改，更新
+        .controls(style='display: none;')#share2home_file
+          div.topimg
+            input(type='file', name='topimg').inline
+            span.help-inline 话题头图尺寸(宽*高): 780px * 240px
+        
+        
 
-script
-  require(['/javascripts/page/topic.edit.js']);
+    .form-actions
+      - if(action=="edit")
+        input(type='hidden', name='topic_id', value='#{topic.id}')
+      button(type='submit').btn.btn-primary
+        - if(action=="new")
+          | 确认提交，发布
+        - else
+          | 确认修改，更新
+
+  script
+    require(['/javascripts/page/topic.edit.js']);

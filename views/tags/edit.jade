@@ -1,53 +1,57 @@
-include ../includes/messages
+extends ../layouts/person
 
-.row
-  .span2.sidebar
-    include ../includes/sidebar_person
-  .span10
+block content
 
-    .page-header
-      .pull-right
-        a(href='/tags').btn.btn-info 返回标签管理
-      h1= title
-        | 
-        small 创建一个新标签
+  include ../includes/messages
 
-    form(action='#{form_action}', method='post').form-vertical
-      .control-group
-        label.control-label
-          strong 名称
-        .controls
-            - if(action=="new")
-              input(name='name', type='text', value=locals.tag_name).span3
-            - else
-              input(name='name', type='text', value=tag.name).span3
-          p.help-block 字数长度在2~20个字
-      .control-group
-        label.control-label
-          strong 描述
-            textarea(name='description', rows='2')#wmd-input.span3
+  .row
+    .span2.sidebar
+      include ../includes/sidebar_person
+    .span10
+
+      .page-header
+        .pull-right
+          a(href='/tags').btn.btn-info 返回标签管理
+        h1= title
+          | 
+          small 创建一个新标签
+
+      form(action='#{form_action}', method='post').form-vertical
+        .control-group
+          label.control-label
+            strong 名称
+          .controls
               - if(action=="new")
-                | !{locals.tag_description}
+                input(name='name', type='text', value=locals.tag_name).span3
               - else
-                | !{tag.description}
-      .control-group
-        label.control-label
-          strong 顺序
-        .controls
+                input(name='name', type='text', value=tag.name).span3
+            p.help-block 字数长度在2~20个字
+        .control-group
+          label.control-label
+            strong 描述
+              textarea(name='description', rows='2')#wmd-input.span3
+                - if(action=="new")
+                  | !{locals.tag_description}
+                - else
+                  | !{tag.description}
+        .control-group
+          label.control-label
+            strong 顺序
+          .controls
+              - if(action=="new")
+                input(name='sequence', type='text', value=locals.tag_sequence || 0).span1
+              - else
+                input(name='sequence', type='text', value=tag.sequence || 0).span1
+            p.help-block 标签排列顺序，默认为0，数值越大越靠前
+
+        .form-actions
+          - if(action=="edit")
+            input(type='hidden', name="tag_id", value=tag.id)
+          button(type='submit').btn.btn-primary
             - if(action=="new")
-              input(name='sequence', type='text', value=locals.tag_sequence || 0).span1
+              | 确认提交，发布
             - else
-              input(name='sequence', type='text', value=tag.sequence || 0).span1
-          p.help-block 标签排列顺序，默认为0，数值越大越靠前
+              | 确认修改，更新
 
-      .form-actions
-        - if(action=="edit")
-          input(type='hidden', name="tag_id", value=tag.id)
-        button(type='submit').btn.btn-primary
-          - if(action=="new")
-            | 确认提交，发布
-          - else
-            | 确认修改，更新
-
-script
-  require(['/javascripts/page/person.tags.js']);
+  script
+    require(['/javascripts/page/person.tags.js']);

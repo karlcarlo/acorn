@@ -1,38 +1,42 @@
-include ../includes/messages
+extends ../layouts/person
 
-.row
-  .span2.sidebar
-    include ../includes/sidebar_person
-  .span10
-    .page-header
-      .pull-right
-        a(href='/topics/new').btn.btn-info 发布新话题
-      h1 最近发表的话题
+block content
 
-    table.topics-list.table.table-condensed
-      thead
-        tr
-          th 名称
-          th 标签
-          th 日期
-          th 操作
-      tbody
-        - each topic in topics
+  include ../includes/messages
+
+  .row
+    .span2.sidebar
+      include ../includes/sidebar_person
+    .span10
+      .page-header
+        .pull-right
+          a(href='/topics/new').btn.btn-info 发布新话题
+        h1 最近发表的话题
+
+      table.topics-list.table.table-condensed
+        thead
           tr
-            td
-              a(href='/topics/#{topic._id}/edit')= topic.title
-            td
-              - each tag in topic.tags
-                a(href='/topics?tag=#{tag._id}', title='#{tag.description}')= tag.name
-                |  
+            th 名称
+            th 标签
+            th 日期
+            th 操作
+        tbody
+          - each topic in topics
+            tr
+              td
+                a(href='/topics/#{topic._id}/edit')= topic.title
+              td
+                - each tag in topic.tags
+                  a(href='/topics?tag=#{tag._id}', title='#{tag.description}')= tag.name
+                  |  
 
-            td= topic.timestamp.less
-            td
-              a(href='/topics/#{topic._id}/edit')
-                i.icon-edit
-              a(href='/topics/#{topic._id}/delete').topic-destroy-action
-                i.icon-remove
+              td= topic.timestamp.less
+              td
+                a(href='/topics/#{topic._id}/edit')
+                  i.icon-edit
+                a(href='/topics/#{topic._id}/delete').topic-destroy-action
+                  i.icon-remove
 
 
-script
-  require(['/javascripts/page/person.profile.js']);
+  script
+    require(['/javascripts/page/person.profile.js']);

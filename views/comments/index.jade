@@ -1,28 +1,32 @@
-include ../includes/messages
+extends ../layouts/person
 
-.row
-  .span2.sidebar
-    include ../includes/sidebar_person
-  .span10
-    .page-header
-      .pull-right
-      h1 评论管理
+block content
 
-    table.comments-list.table.table-condensed
-      thead
-        tr
-          th 内容
-          th 作者
-          th 操作
-      tbody
-        - each comment in comments
+  include ../includes/messages
+
+  .row
+    .span2.sidebar
+      include ../includes/sidebar_person
+    .span10
+      .page-header
+        .pull-right
+        h1 评论管理
+
+      table.comments-list.table.table-condensed
+        thead
           tr
-            td= comment.content
-            td= comment.author.name
-            td
-              a(href='/comments/#{comment._id}/delete').comment-destroy-action
-                i.icon-remove
+            th 内容
+            th 作者
+            th 操作
+        tbody
+          - each comment in comments
+            tr
+              td= comment.content
+              td= comment.author.name
+              td
+                a(href='/comments/#{comment._id}/delete').comment-destroy-action
+                  i.icon-remove
 
 
-script
-  require(['/javascripts/page/person.comments.js']);
+  script
+    require(['/javascripts/page/person.comments.js']);
