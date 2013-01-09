@@ -73,6 +73,7 @@ app.del('/assets/:id/delete', routes.assets_destroy);
 
 // Topic
 app.get('/topics.:format?', routes.topics_index);
+app.get('/topics/latest.:format?', routes.topics_latest);
 app.get('/topics/new', routes.topics_new);
 app.get('/topics/:id', routes.topics_show);
 app.get('/topics/:id/edit', routes.topics_edit);

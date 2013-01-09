@@ -112,6 +112,36 @@ exports.index = function(req, res){
 };
 
 /*
+ * GET topic latest
+ */
+exports.latest = function(req, res){
+  var query_obj = {
+    permission: 'public'
+  };
+
+  Topic
+  .find(query_obj, null, { sort: [[ 'updated_at', 'desc' ]]})
+  .populate('author')
+  .limit(5)
+  .exec(function(err, topics){
+    if(req.params.format && req.params.format == 'json'){
+      var res_obj = {
+        success: true,
+        message: '',
+        topics: []
+      };
+      res_obj.topics = topics;
+      res.json(res_obj);
+      return;
+    }
+    else{
+      res.render('topics/index', { topics: topics });
+    }
+  });
+};
+
+
+/*
  * GET topic show
  */
 exports.show = function(req, res, next){

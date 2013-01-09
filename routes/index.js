@@ -39,6 +39,7 @@ exports.assets_destroy = assets_controller.destroy;
 
 // topics
 exports.topics_index = topics_controller.index;
+exports.topics_latest = topics_controller.latest;
 exports.topics_show = topics_controller.show;
 exports.topics_new = topics_controller.new;
 exports.topics_create = topics_controller.create;
