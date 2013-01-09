@@ -44,7 +44,7 @@ exports.index = function(req, res){
   .populate('author')
   .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
   .limit(6)
-  .run(function(err, topics){
+  .exec(function(err, topics){
     res.local('topics', topics);
     // 开源项目
     res.local('projects', [
