@@ -1,5 +1,8 @@
-include ../includes/messages
+extends ../layouts/blank
 
-.row
-  .span12.centered
-    a(href='/').btn 返回首页
+block content
+  include ../includes/messages
+
+  .row
+    .span12.centered
+      a(href='/').btn 返回首页

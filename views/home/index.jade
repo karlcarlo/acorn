@@ -1,37 +1,41 @@
-include ../includes/messages
+extends ../layouts/home
 
-.row
-  .home-topics.span9
-    h3
-      a(href='/topics') 最新话题
-    ul.topics-list.unstyled
-      - each topic in topics
-        li
-          .meta-date
-            span.date-month= topic.timestamp.month_name_en
-            span.date-date= topic.timestamp.date
-            span.date-year= topic.timestamp.year
-          .topic-topimg
-            - if(topic.is_elite)
-              a(href='/topics/#{topic._id}')
-                span.img(style='background: url(' + topic.topimg + ') no-repeat center;', title=topic.title)
-          .topic-title
-            span.title-bar
-              span.corner
-                a(href='/topics/#{topic._id}')= topic.title
-          .topic-brief!= topic.brief
-          .meta-info
-            span.meta-author
-              // i.icon-user
-              a(href='/profile/#{topic.author.id}')= topic.author.name
-            span.meta-tag
-              // i.icon-tag
-              a(href='/topics?tag=#{topic.tags[0]._id}')= topic.tags[0].name
-  .sidebar.span3
-    h3 用户
-    #people_avatars.avatars
+block content
 
-    include ../includes/sidebar
+  include ../includes/messages
 
-script
-  require(['/javascripts/page/home.index.js']);
+  .row
+    .home-topics.span9
+      h3
+        a(href='/topics') 最新话题
+      ul.topics-list.unstyled
+        - each topic in topics
+          li
+            .meta-date
+              span.date-month= topic.timestamp.month_name_en
+              span.date-date= topic.timestamp.date
+              span.date-year= topic.timestamp.year
+            .topic-topimg
+              - if(topic.is_elite)
+                a(href='/topics/#{topic._id}')
+                  span.img(style='background: url(' + topic.topimg + ') no-repeat center;', title=topic.title)
+            .topic-title
+              span.title-bar
+                span.corner
+                  a(href='/topics/#{topic._id}')= topic.title
+            .topic-brief!= topic.brief
+            .meta-info
+              span.meta-author
+                // i.icon-user
+                a(href='/profile/#{topic.author.id}')= topic.author.name
+              span.meta-tag
+                // i.icon-tag
+                a(href='/topics?tag=#{topic.tags[0]._id}')= topic.tags[0].name
+    .sidebar.span3
+      h3 用户
+      #people_avatars.avatars
+
+      include ../includes/sidebar
+
+  script
+    require(['/javascripts/page/home.index.js']);
