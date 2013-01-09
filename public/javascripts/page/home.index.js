@@ -1,10 +1,10 @@
 /*
  * home index
  */
-require(['jquery', 'app/fill_avatar'], function($, fill_avatar){
+require(['jquery', 'app/fill_avatars'], function($, fill_avatars){
   $(function(){
     
-    fill_avatar({
+    fill_avatars({
       container: '#people_avatars' 
     });
 

@@ -14,7 +14,8 @@ require([
   '/javascripts/lib/google-code-prettify/prettify.js'
 ], function(
   $, 
-  fill_tags
+  fill_tags,
+  fill_topics
 ){
   $(function(){
     // init code highlight
@@ -22,7 +23,6 @@ require([
     window.prettyPrint && prettyPrint();
 
     fill_tags();
-
     fill_topics();
 
   });
