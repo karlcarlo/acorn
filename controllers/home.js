@@ -1,4 +1,4 @@
-var config = require('../config').config;
+var config = require('../config');
 
 var models = require('../models')
   , Topic = models.Topic;

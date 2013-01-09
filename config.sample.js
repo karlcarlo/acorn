@@ -1,4 +1,4 @@
-exports.config = {
+module.exports = {
   application: {
     version: 'v0.2.3',
     title: "Acorn Blog",
