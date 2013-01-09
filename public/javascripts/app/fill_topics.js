@@ -26,7 +26,7 @@ define(['jquery'], function($){
     }
 
     function substr(str, size){
-      if(str.length >= size) return str;
+      if(str.length <= size) return str;
       return str.substr(0, size - 2) + '..'
     }
   };
