@@ -15,5 +15,23 @@ module.exports = {
   },
   cookie: {
     name: 'acorn'
+  },
+  allow_image_types: /\.(gif|jpe?g|png)$/i,
+  thumbs: {
+    s: {
+      width: 80,
+      height: 60
+    },
+    m: {
+      width: 120,
+      height: 90
+    },
+    b: {
+      width: 240,
+      height: 160
+    },
+    l: {
+      width: 960
+    }
   }
 }

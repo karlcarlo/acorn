@@ -1,15 +1,16 @@
 {
-    "name": "feblog"
-  , "version": "0.0.1"
+    "name": "acorn"
+  , "version": "0.2.3"
   , "private": true
   , "dependencies": {
-      "express": "2.5.x"
-    , "jade": ">= 0.0.1"
-    , "node-markdown": ">= 0.1.0"
-    , "mongoose": ">= 2.5.7"
+      "express": "3.x"
+    , "jade": "*"
+    , "node-markdown": "*"
+    , "mongoose": "3.x"
     , "validator": ">= 0.4.2"
     , "less": ">= 1.2.2"
     , "async": "*"
+    , "imagemagick": "*"
   }
   , "devDependencies": {
       "api-easy": "0.3.x"
