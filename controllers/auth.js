@@ -11,13 +11,29 @@ var controllers;
 
 var helpers = require('../helpers');
 
+var words = {
+  signin: '登录',
+  signup: '注册',
+  signout: '退出',
+  no_login: '您还未登录，不能进行当前操作。',
+  no_exist: '用户不存在或已被删除。',
+  no_active: '用户被冻结或未激活。',
+  is_exist: '邮箱或昵称已被占用。',
+  permission_denied: '您没有操作权限。',
+  empty_email: '邮件或密码为空。',
+  format_error_email: '邮件格式有误。',
+  denied_email: '用户名或密码有误。',
+  error_find_tags: '选中标签加载出错！',
+  success_signin: '欢迎回来 ',
+  success_siginup: '新用户注册成功！',
+  success_siginout: '您已经成功退出登录。'
+}
+
 
 /*
  * auth controller
  */
 exports.signin = function(req, res, next){
-  // 使用空白模版
-  res.local('layout', 'layouts/blank');
 
   var method = req.method.toLowerCase();
   if(method == 'get'){
@@ -35,7 +51,7 @@ exports.signin = function(req, res, next){
 
     // validators
     if(email == '' || passwd == ''){
-      req.flash('msg_alert', '邮件或密码为空。');
+      res.app.locals.messages.push({type: 'alert', content: words.empty_email});
       res.render('auth/signin');
       return;
     }
@@ -44,27 +60,27 @@ exports.signin = function(req, res, next){
       check(email).len(6, 40).isEmail();
     }
     catch(error){
-      req.flash('msg_error', '邮件格式有误。');
+      res.app.locals.messages.push({type: 'error', content: words.format_error_email});
       res.render('auth/signin');
       return;
     }
 
     Person.findOne({email: email}, function(err, person){
       if(!person){
-        req.flash('msg_error', '这个用户不存在。');
+        res.app.locals.messages.push({type: 'error', content: words.no_exist});
         res.render('auth/signin');
         return;
       }
 
       if(!person.active){
-        req.flash('msg_error', '用户被冻结或未激活。');
+        res.app.locals.messages.push({type: 'error', content: words.no_active});
         res.render('auth/signin');
         return;
       }
 
       var encrypted_passwd = encrypted_password(passwd, person.salt);
       if(person.hashed_password != encrypted_passwd){
-        req.flash('msg_error', '用户名或密码有误。');
+        res.app.locals.messages.push({type: 'error', content: words.denied_email});
         res.render('auth/signin');
         return;
       }
@@ -72,7 +88,7 @@ exports.signin = function(req, res, next){
       // 存储用户对象到Session
       req.session.person = person;
       session_init(person, res);
-      req.flash('msg_info', '欢迎回来 ' + person.name);
+      res.app.locals.messages.push({type: 'info', content: words.success_signin + person.name});
       res.redirect('/');
     });
 
@@ -81,15 +97,13 @@ exports.signin = function(req, res, next){
 
 exports.signout = function(req, res, next){
   req.session.regenerate(function(err){
-    req.flash('msg_info', '您已经成功退出登录。');
-    res.local('layout', 'layouts/blank');
+    res.app.locals.messages.push({type: 'alert', content: words.success_siginout});
     res.clearCookie(config.cookie.name, {path: '/'});
     res.redirect('/signin');
   });
 };
 
 exports.signup = function(req, res, next){
-  res.local('layout', 'layouts/blank');
 
   var method = req.method.toLowerCase();
   if(method == 'get'){
@@ -111,7 +125,7 @@ exports.signup = function(req, res, next){
 
     //validator
     if(email == '' || passwd == '' || name == ''){
-      req.flash('msg_alert', '邮件、密码或昵称为空。');
+      res.app.locals.messages.push({type: 'alert', content: words.empty_email});
       res.render('auth/signup');
       return;
     }
@@ -120,7 +134,7 @@ exports.signup = function(req, res, next){
       check(email, '邮件格式有误。').len(6, 40).isEmail();
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({type: 'error', content: error.message});
       res.render('auth/signup');
       return;
     }
@@ -129,7 +143,7 @@ exports.signup = function(req, res, next){
       check(passwd, '密码只能使用非空的任意字符，长度为6~20个字符。').is(/^[\S]{6,20}$/);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({type: 'error', content: error.message});
       res.render('auth/signup');
       return;
     }
@@ -138,7 +152,7 @@ exports.signup = function(req, res, next){
       check(name, '昵称只能使用中文、英文和数字，长度为2~20个字符。').len(2, 20).is(/^[a-zA-Z0-9\u4e00-\u9fa5]+$/);
     }
     catch(error){
-      req.flash('msg_error', error.message);
+      res.app.locals.messages.push({type: 'error', content: error.message});
       res.render('auth/signup');
       return;
     }
@@ -146,7 +160,7 @@ exports.signup = function(req, res, next){
     Person.findOne({'$or': [{'name':name}, {'email':email}]}, function(err, person){
       if(err) return next(err);
       if(person){
-        req.flash('msg_error', '邮箱或昵称已被占用。');
+        res.app.locals.messages.push({ type: 'error', content: words.is_exist });
         res.render('auth/signup');
         return;
       }
@@ -163,7 +177,7 @@ exports.signup = function(req, res, next){
       person.avatar = avatar;
       
       person.save(function(err){
-        req.flash('msg_success', '新用户注册成功！');
+        res.app.locals.messages.push({type: 'success', content: words.success_siginup});
         res.redirect('/signin');
       });
 
@@ -186,7 +200,7 @@ exports.authenticate = function(req, res, next){
       else{
         req.session.person.is_root = false;
       }
-      res.local('member', req.session.person);
+      res.locals.member = req.session.person;
       return next();
     }
     else{
@@ -217,7 +231,7 @@ exports.authenticate = function(req, res, next){
         }
 
         req.session.person = person;
-        res.local('member', req.session.person);
+        res.locals.member = req.session.person;
         return next();
 
       });

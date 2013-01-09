@@ -1,48 +1,52 @@
-.breadcrumb
-  li
-    a(href='/') 首页
-    span.divider /
-  li.active
-    | 登录
+extends ../layouts/blank
 
-.page-header
-  .pull-right
-    //- a(href='/signup').btn.btn-info 注册
-  h1 登录
-    | 
-    small 欢迎回来
+block content
 
-include ../includes/messages
+  .breadcrumb
+    li
+      a(href='/') 首页
+      span.divider /
+    li.active
+      | 登录
 
-form(action='/signin', method='post').form-horizontal
-  .control-group
-    label.control-label
-      strong 邮箱
-    .controls
-      .input-prepend
-        span.add-on
-          i.icon-envelope
-        input(type='text', name='email', value=locals.email).span3
-        span.help-inline 请输入您的邮箱
-  .control-group
-    label.control-label
-      strong 密码
-    .controls
-      .input-prepend
-        span.add-on
-          i.icon-lock
-        input(type='password', name='passwd', value=locals.passwd).span3
-        span.help-inline 请输入您的登录密码
-  
-  //
+  .page-header
+    .pull-right
+      //- a(href='/signup').btn.btn-info 注册
+    h1 登录
+      | 
+      small 欢迎回来
+
+  include ../includes/messages
+
+  form(action='/signin', method='post').form-horizontal
     .control-group
       label.control-label
+        strong 邮箱
       .controls
-        label.checkbox
-          input(type='checkbox', checked='checked')
-          | 下次自动登录（保存两周）
-          a(href='/forgot') 忘记密码？
+        .input-prepend
+          span.add-on
+            i.icon-envelope
+          input(type='text', name='email', value=locals.email).span3
+          span.help-inline 请输入您的邮箱
+    .control-group
+      label.control-label
+        strong 密码
+      .controls
+        .input-prepend
+          span.add-on
+            i.icon-lock
+          input(type='password', name='passwd', value=locals.passwd).span3
+          span.help-inline 请输入您的登录密码
+    
+    //
+      .control-group
+        label.control-label
+        .controls
+          label.checkbox
+            input(type='checkbox', checked='checked')
+            | 下次自动登录（保存两周）
+            a(href='/forgot') 忘记密码？
 
-  .form-actions
-    button(type='submit').btn.btn-primary.btn-large
-      | 登录
+    .form-actions
+      button(type='submit').btn.btn-primary.btn-large
+        | 登录

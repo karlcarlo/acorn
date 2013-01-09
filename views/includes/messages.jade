@@ -1,19 +1,18 @@
-- if(messages.msg_alert)
-  .alert
-    a(data-dismiss='alert').close x
-    = messages.msg_alert
-
-- if(messages.msg_info)
-  .alert.alert-info
-    a(data-dismiss='alert').close x
-    = messages.msg_info
-
-- if(messages.msg_error)
-  .alert.alert-error
-    a(data-dismiss='alert').close x
-    = messages.msg_error
-
-- if(messages.msg_success)
-  .alert.alert-success
-    a(data-dismiss='alert').close x
-    = messages.msg_success
+- while(Array.isArray(messages) && messages.length)
+  - var message = messages.pop();
+  - if(message.type == 'alert')
+    .alert
+      a(data-dismiss='alert').close x
+      = message.content
+  - if(message.type == 'info')
+    .alert.alert-info
+      a(data-dismiss='alert').close x
+      = message.content
+  - if(message.type == 'error')
+    .alert.alert-error
+      a(data-dismiss='alert').close x
+      = message.content
+  - if(message.type == 'success')
+    .alert.alert-success
+      a(data-dismiss='alert').close x
+      = message.content

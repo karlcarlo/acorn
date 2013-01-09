@@ -1,48 +1,52 @@
-.breadcrumb
-  li
-    a(href='/') 首页
-    span.divider /
-  li.active
-    | 注册
+extends ../layouts/blank
 
-.page-header
-  .pull-right
-    a(href='/signin').btn.btn-info 登录
-  h1 注册
-    | 
-    small 注册新用户
+block content
 
-include ../includes/messages
+  .breadcrumb
+    li
+      a(href='/') 首页
+      span.divider /
+    li.active
+      | 注册
 
-form(action='/signup', method='post').form-horizontal
-  .control-group
-    label.control-label
-      strong 邮箱
-    .controls
-      .input-prepend
-        span.add-on
-          i.icon-envelope
-        input(type='text', name='email', value=locals.email).span3
-      p.help-block 示例：abc@def.com
-  .control-group
-    label.control-label
-      strong 密码
-    .controls
-      .input-prepend
-        span.add-on
-          i.icon-lock
-        input(type='password', name='passwd', value=locals.passwd).span3
-      p.help-block 长度控制在6~20个字符
-  .control-group
-    label.control-label
-      strong 昵称
-    .controls
-      .input-prepend
-        span.add-on
-          i.icon-user
-        input(type='text', name='name', value=locals.name).span3
-      p.help-block 长度控制在2~20个字符
+  .page-header
+    .pull-right
+      a(href='/signin').btn.btn-info 登录
+    h1 注册
+      | 
+      small 注册新用户
 
-  .form-actions
-    button(type='submit').btn.btn-primary
-      | 确认提交，注册
+  include ../includes/messages
+
+  form(action='/signup', method='post').form-horizontal
+    .control-group
+      label.control-label
+        strong 邮箱
+      .controls
+        .input-prepend
+          span.add-on
+            i.icon-envelope
+          input(type='text', name='email', value=locals.email).span3
+        p.help-block 示例：abc@def.com
+    .control-group
+      label.control-label
+        strong 密码
+      .controls
+        .input-prepend
+          span.add-on
+            i.icon-lock
+          input(type='password', name='passwd', value=locals.passwd).span3
+        p.help-block 长度控制在6~20个字符
+    .control-group
+      label.control-label
+        strong 昵称
+      .controls
+        .input-prepend
+          span.add-on
+            i.icon-user
+          input(type='text', name='name', value=locals.name).span3
+        p.help-block 长度控制在2~20个字符
+
+    .form-actions
+      button(type='submit').btn.btn-primary
+        | 确认提交，注册
