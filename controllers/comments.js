@@ -11,6 +11,25 @@ var controllers;
 
 var helpers = require('../helpers');
 
+var words = {
+  name: '评论',
+  new: '新增',
+  create: '创建',
+  edit: '编辑',
+  update: '更新',
+  destroy: '删除',
+  no_login: '您还未登录，不能进行当前操作。',
+  no_exist: '此评论不存在或已被删除。',
+  permission_denied: '您没有操作权限。',
+  empty_name: '名称或描述不能为空。',
+  empty_content: '内容不能为空。',
+  success_create: '新评论已经保存，请继续发布。',
+  success_update: '评论已经更新！',
+  success_destroy: '评论已经成功删除。',
+  params_error: '参数错误',
+  find_error: '加载话题或参数错误'
+}
+
 /*
  * GET /comments
  */
@@ -35,18 +54,18 @@ exports.index = function(req, res){
 
     if(!topic_id){
       res_obj.success = false;
-      res_obj.message = '参数错误';
+      res_obj.message = words.params_error;
       res.json(res_obj);
       return;
     }
 
     Message
-    .find({topic: topic_id}, ['content', 'created_at', 'author', 'topic', 'parent'], { sort: [[ 'created_at', 'desc' ]]})
-    .populate('author', ['_id', 'name', 'email', 'avatar'])
-    .populate('topic', ['_id', 'title'])
+    .find({topic: topic_id}, 'content created_at author topic parent', { sort: [[ 'created_at', 'desc' ]]})
+    .populate('author', '_id name email avatar')
+    .populate('topic', '_id title')
     .populate('parent')
     .limit(10)
-    .run(function(err, comments){
+    .exec(function(err, comments){
       res_obj.comments = comments;
       res.json(res_obj);
       return;
@@ -56,22 +75,34 @@ exports.index = function(req, res){
   else{
 
     if(!req.session.person || !req.session.person.is_root){
-      req.flash('msg_alert', '您没有操作权限。');
+      res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
       res.redirect('/notify');
       return;
     }
 
+    // 分页对象
+    var pagination = {
+      max_items: 0,
+      max_pages:0,
+      items_per_page: 20,
+      link_to: '/topics',
+      prev_page: 0,
+      next_page: 0,
+      current_page: 0
+    };
+
+    res.locals.pagination = pagination;
+
     Message
-    .find({}, ['content', 'created_at', 'author', 'topic', 'parent'], { sort: [[ 'created_at', 'desc' ]]})
-    .populate('author', ['_id', 'name', 'email', 'avatar'])
-    .populate('topic', ['_id', 'title'])
+    .find({}, 'content created_at author topic parent', { sort: [[ 'created_at', 'desc' ]]})
+    .populate('author', '_id name email avatar')
+    .populate('topic', '_id title')
     .populate('parent')
     .limit(10)
-    .run(function(err, comments){
+    .exec(function(err, comments){
 
       res.locals({
-        comments: comments,
-        layout: 'layouts/person'
+        comments: comments
       });
 
       res.render('comments/index');
@@ -93,7 +124,7 @@ exports.create = function(req, res){
 
   if(!req.session.person){
     res_obj.success = false;
-    res_obj.message = '您还未登录，不能发布评论';
+    res_obj.message = words.no_login;
     res.json(res_obj);
     return;
   }
@@ -102,18 +133,18 @@ exports.create = function(req, res){
 
   if(!topic_id){
     res_obj.success = false;
-    res_obj.message = '参数错误';
+    res_obj.message = words.params_error;
     res.json(res_obj);
     return;
   }
 
   Topic
   .findById(topic_id)
-  .run(function(err, topic){
+  .exec(function(err, topic){
     
     if(err || !topic){
       res_obj.success = false;
-      res_obj.message = '加载话题或参数错误';
+      res_obj.message = words.find_error;
       res.json(res_obj);
       return;
     }
@@ -124,7 +155,7 @@ exports.create = function(req, res){
     // 验证内容是否为空
     if(content == ''){
       res_obj.success = false;
-      res_obj.message = '内容不能为空。';
+      res_obj.message = words.empty_content;
       res.json(res_obj);
       return;
     }
@@ -150,7 +181,7 @@ exports.create = function(req, res){
       topic.comments.push(message);
       topic.save(function(err){
         res_obj.success = true;
-        res_obj.message = '评论已经成功保存';
+        res_obj.message = words.success_create;
         res.json(res_obj);
       });
     });
@@ -164,7 +195,7 @@ exports.create = function(req, res){
  */
 exports.destroy = function(req, res){
   if(!req.session.person || !req.session.person.is_root){
-    req.flash('msg_alert', '您没有操作权限。');
+    res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
     res.redirect('/notify');
     return;
   }
@@ -173,7 +204,7 @@ exports.destroy = function(req, res){
 
   Message
   .remove({_id: comment_id}, function(err){
-    req.flash('msg_success', '评论已经成功删除。');
+    res.app.locals.messages.push({ type: 'success', content: words.success_destroy });
     res.redirect('/comments');
   });
   

@@ -12,6 +12,25 @@ var controllers;
 
 var helpers = require('../helpers');
 
+var words = {
+  name: '资源',
+  new: '新增',
+  create: '创建',
+  edit: '编辑',
+  update: '更新',
+  destroy: '删除',
+  no_login: '您还未登录，不能进行当前操作。',
+  no_exist: '此资源不存在或已被删除。',
+  permission_denied: '您没有操作权限。',
+  empty_name: '名称不能为空。',
+  empty_content: '内容不能为空。',
+  success_create: '新资源已经保存，请继续发布。',
+  success_update: '资源已经更新！',
+  success_destroy: '资源已经成功删除。',
+  params_error: '参数错误',
+  find_error: '加载资源或参数错误'
+}
+
 /*
  * GET /tags
  */
@@ -24,8 +43,8 @@ exports.index = function(req, res){
       assets: []
     };
 
-    Assetc
-    .find({  }, [], { sort: [[ 'created_at', 'desc' ]]})
+    Asset
+    .find({}, null, { sort: [[ 'created_at', 'desc' ]]})
     .limit(20)
     .run(function(err, assets){
       res_obj.assets = assets;
@@ -33,8 +52,40 @@ exports.index = function(req, res){
       return;
     });
   }
+  else{
 
-  res.redirect('/');
+    if(!req.session.person || !req.session.person.is_root){
+      res.app.locals.messages.push({ type: 'alert', content: words.permission_denied });
+      res.redirect('/notify');
+      return;
+    }
+
+    // 分页对象
+    var pagination = {
+      max_items: 0,
+      max_pages:0,
+      items_per_page: 20,
+      link_to: '/topics',
+      prev_page: 0,
+      next_page: 0,
+      current_page: 0
+    };
+
+    res.locals.pagination = pagination;
+
+    Asset
+    .find({}, null, { sort: [[ 'created_at', 'desc' ]]})
+    .exec(function(err, assets){
+
+      res.locals({
+        assets: assets
+      });
+
+      res.render('assets/index');
+      return;
+    });
+
+  }
 
 };
 
