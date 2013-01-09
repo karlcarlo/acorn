@@ -47,7 +47,7 @@ exports.index = function(req, res, next){
     };
     
     Person
-    .find({ active: true }, ['_id', 'name', 'email', 'avatar', 'title', 'motto', 'duty', 'created_at'], { sort: [[ 'created_at', 'asc' ]] })
+    .find({ active: true }, '_id name email avatar title motto duty created_at', { sort: [[ 'created_at', 'asc' ]] })
     .exec(function(err, people){
       res_obj.people = people;
       res.json(res_obj);
