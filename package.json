@@ -11,6 +11,7 @@
     , "less": ">= 1.2.2"
     , "async": "*"
     , "imagemagick": "*"
+    , "less-middleware": "*"
   }
   , "devDependencies": {
       "api-easy": "0.3.x"
