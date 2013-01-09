@@ -8,8 +8,8 @@ var express = require('express')
   , path = require('path')
   , fs = require('fs')
   , markdown = require('node-markdown').Markdown
-  , access_log = fs.createWriteStream('./logs/access.log', {flags: 'a'})
-  , error_log = fs.createWriteStream('./logs/error.log', {flags: 'a'})
+  , access_log = fs.createWriteStream('./logs/access.log', { flags: 'a' })
+  , error_log = fs.createWriteStream('./logs/error.log', { flags: 'a' })
 
 var config = require('./config')
 
@@ -21,7 +21,8 @@ app.configure(function(){
   app.set('port', process.env.PORT || config.application.port);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.use(express.logger({stream: access_log}));
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
   app.use(express.bodyParser({ uploadDir: './tmp' }));
   app.use(express.methodOverride());
   app.use(express.cookieParser(config.session.secret));
@@ -31,8 +32,6 @@ app.configure(function(){
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
 });
-
-
 
 app.configure('development', function(){
   app.use(express.errorHandler());
@@ -93,16 +92,6 @@ app.del('/tags/:id/delete', routes.tags_destroy);
 app.get('/comments.:format?', routes.comments_index);
 app.post('/comments', routes.comments_create);
 app.del('/comments/:id/delete', routes.comments_destroy);
-
-// finalize route
-app.get('*', function(req, res){
-  console.log('page not found (404 handler) - ' + (new Date).toString());
-  res.render('home/404', {
-    status: 404,
-    title: config.application.name,
-    layout: 'layouts/blank'
-  });
-});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("%s server listening on port %d in %s mode", config.application.name, app.get('port'), app.settings.env);
