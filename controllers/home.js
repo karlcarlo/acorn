@@ -45,14 +45,14 @@ exports.index = function(req, res){
   .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
   .limit(6)
   .exec(function(err, topics){
-    res.local('topics', topics);
+    res.locals.topics = topics;
     // 开源项目
-    res.local('projects', [
+    res.locals.projects = [
       { url: '#', logo: '/images/icon_almond.png', name: '杏仁', codename: 'Almond', desc: '前端快速开发框架' }, 
       { url: '#', logo: '/images/icon_walnut.png', name: '核桃', codename: 'Walnut', desc: '辅助开发工具包' },
       { url: '#', logo: '/images/icon_acorn.png', name: '橡树果', codename: 'Acorn', desc: 'Node平台轻博客' },
       { url: '#', logo: '/images/logo_avatar.png', name: '松子', codename: 'Pinenut', desc: 'Less转css应用' }
-    ]);
+    ];
 		res.render('home/index', { layout: 'layouts/home' });
 	});
 
