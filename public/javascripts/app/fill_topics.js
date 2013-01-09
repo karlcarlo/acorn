@@ -8,7 +8,7 @@ define(['jquery'], function($){
       // 填充标签
       var $container = $(settings.container);
       if($container.length){
-        $.get('/topics.json', function(json){
+        $.get('/topics/latest.json', function(json){
           if(!json || !json.success){
             return;
           }
