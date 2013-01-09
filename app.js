@@ -17,14 +17,10 @@ var helpers = require('./helpers');
 
 var app = express();
 
-
 app.configure(function(){
   app.set('port', process.env.PORT || config.application.port);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.set('view options', {
-    layout: 'layouts/layout'
-  });
   app.use(express.logger({stream: access_log}));
   app.use(express.bodyParser({ uploadDir: './tmp' }));
   app.use(express.methodOverride());
