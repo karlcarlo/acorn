@@ -56,13 +56,15 @@ exports.signin = function(req, res, next){
       return;
     }
 
-    try{
-      check(email).len(6, 40).isEmail();
-    }
-    catch(error){
-      res.app.locals.messages.push({type: 'error', content: words.format_error_email});
-      res.render('auth/signin');
-      return;
+    if(email !== config.application.root_account){
+      try{
+        check(email).len(6, 40).isEmail();
+      }
+      catch(error){
+        res.app.locals.messages.push({type: 'error', content: words.format_error_email});
+        res.render('auth/signin');
+        return;
+      }
     }
 
     Person.findOne({email: email}, function(err, person){
