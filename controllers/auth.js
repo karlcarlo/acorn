@@ -1,5 +1,5 @@
 var crypto = require('crypto'),
-  config = require('../config').config;
+  config = require('../config');
 
 var check = require('validator').check,
   sanitize = require('validator').sanitize;
