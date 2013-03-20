@@ -3,17 +3,10 @@
   , "version": "0.2.3"
   , "private": true
   , "dependencies": {
-<<<<<<< HEAD
       "express": "3.x"
     , "jade": "*"
     , "node-markdown": "*"
     , "mongoose": "3.x"
-=======
-      "express": "2.5.x"
-    , "jade": ">= 0.0.1"
-    , "node-markdown": ">= 0.1.0"
-    , "mongoose": "2.5.x"
->>>>>>> eb4005c2c51246c2405cf41d1f1cf1e152b433fd
     , "validator": ">= 0.4.2"
     , "less": ">= 1.2.2"
     , "async": "*"
