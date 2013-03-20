@@ -5,7 +5,7 @@ var fs = require('fs')
   , util = require('util')
   , mongoose = require('mongoose')
   , async = require('async')
-  , config= require('../config');
+  , config= require('../config').config;
 
 // mongodb connect
 mongoose.connect(config.database.url, function(err){
@@ -58,22 +58,8 @@ async.waterfall([
             callback(null, uploaddir);
           }
         });  
-      },
-      function(callback){
-
-        Object.keys(config.thumbs).forEach(function(type){
-
-          var thumb_path = uploaddir + '/' + type;
-
-          if(!fs.existsSync(thumb_path)){
-            fs.mkdirSync(thumb_path);
-            console.log(thumb_path + ' path was successfully created.');
-          }
-          
-        });
-        callback(null);
-
       }
+  
     ],
     function(err, results){
         console.log('set env done');
@@ -94,7 +80,7 @@ async.waterfall([
         person.salt = 'salt1336484866068';
         person.hashed_password = 'f4a5bd2867e9bd5cf79a8b31348c03d27993f561'; // origin_password: 123456
         person.name = '管理员';
-        person.avatar = '/asset/img/icon_avatar.png';
+        person.avatar = '/images/icon_avatar.png';
         person.active = true;
         person.save(function(err){
           console.log('root account(' + person.email + ') was successfully created.');
@@ -156,4 +142,7 @@ async.waterfall([
   mongoose.disconnect();
   process.exit(0);
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> eb4005c2c51246c2405cf41d1f1cf1e152b433fd
