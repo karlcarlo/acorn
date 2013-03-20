@@ -6,6 +6,7 @@ Thumbs.db
 *.bak
 *_bak
 /public/uploads/
+/public/stylesheets/*.css
 /tmp/
 config.js
 server.sh
