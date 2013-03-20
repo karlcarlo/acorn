@@ -142,7 +142,3 @@ async.waterfall([
   mongoose.disconnect();
   process.exit(0);
 });
-<<<<<<< HEAD
-
-=======
->>>>>>> eb4005c2c51246c2405cf41d1f1cf1e152b433fd
