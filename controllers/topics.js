@@ -600,7 +600,7 @@ exports.update = function(req, res, next){
                       next(err);
                     }
                     // 添加新标签
-                    topic.tags.$pushAll(tag_ids);
+                    topic.tags.push(tag_ids);
                     topic.save(function(err){
                       if(err){
                         next(err);
@@ -641,7 +641,7 @@ exports.update = function(req, res, next){
             next(err);
           }
           // 添加新标签
-          topic.tags.$pushAll(tag_ids);
+          topic.tags.push(tag_ids);
           topic.save(function(err){
             if(err){
               next(err);
