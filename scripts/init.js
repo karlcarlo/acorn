@@ -5,7 +5,7 @@ var fs = require('fs')
   , util = require('util')
   , mongoose = require('mongoose')
   , async = require('async')
-  , config= require('../config').config;
+  , config= require('../config');
 
 // mongodb connect
 mongoose.connect(config.database.url, function(err){
