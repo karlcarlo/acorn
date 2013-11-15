@@ -83,9 +83,9 @@ exports.profile = function(req, res, next){
   }
 
   Topic
-  .find({ author: req.session.person._id }, null, { sort: [[ 'updated_at', 'desc' ]] })
+  .find({ author: req.session.person._id }, null, { sort: '-updated_at' })
   .populate('author')
-  .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .populate('tags', null, null, { sort: '-sequence -created_at' })
   .limit(10)
   .exec(function(err, topics){
     res.locals.topics = topics;
@@ -124,9 +124,9 @@ exports.set = function(req, res, next){
       , person_title = sanitize(req.body.person_title).trim()
       , motto = sanitize(req.body.motto).trim();
 
-    name = sanitize(name).xss();
-    person_title = sanitize(person_title).xss();
-    motto = sanitize(motto).xss();
+    name = sanitize(name);
+    person_title = sanitize(person_title);
+    motto = sanitize(motto);
 
     // 模版中缓存用户名密码
     res.locals({ 
@@ -220,9 +220,9 @@ exports.set_password = function(req, res, next){
       new_passwd = sanitize(req.body.new_passwd).trim(),
       new_passwd2 = sanitize(req.body.new_passwd2).trim();
 
-    passwd = sanitize(passwd).xss();
-    new_passwd = sanitize(new_passwd).xss();
-    new_passwd2 = sanitize(new_passwd2).xss();
+    passwd = sanitize(passwd);
+    new_passwd = sanitize(new_passwd);
+    new_passwd2 = sanitize(new_passwd2);
 
     // 缓存用户名密码
     res.locals({ 'passwd': passwd, 'new_passwd': new_passwd, 'new_passwd2': new_passwd2 });

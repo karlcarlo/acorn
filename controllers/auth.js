@@ -43,8 +43,6 @@ exports.signin = function(req, res, next){
   if(method == 'post'){
     var email = sanitize(req.body.email).trim()
       , passwd = sanitize(req.body.passwd).trim();
-
-    passwod = sanitize(passwd);
     
     // 缓存用户名密码
     res.locals({ 'email': email, 'passwd': passwd });
@@ -119,9 +117,6 @@ exports.signup = function(req, res, next){
       passwd = sanitize(req.body.passwd).trim(),
       name = sanitize(req.body.name).trim();
 
-    passwd = sanitize(passwd);
-    name = sanitize(name);
-    
     // 缓存用户名密码
     res.locals({ 'email': email, 'passwd': passwd, 'name': name });
 

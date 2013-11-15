@@ -60,7 +60,7 @@ exports.index = function(req, res){
     }
 
     Message
-    .find({topic: topic_id}, 'content created_at author topic parent', { sort: [[ 'created_at', 'desc' ]]})
+    .find({topic: topic_id}, 'content created_at author topic parent', { sort: '-created_at' })
     .populate('author', '_id name email avatar')
     .populate('topic', '_id title')
     .populate('parent')
@@ -94,7 +94,7 @@ exports.index = function(req, res){
     res.locals.pagination = pagination;
 
     Message
-    .find({}, 'content created_at author topic parent', { sort: [[ 'created_at', 'desc' ]]})
+    .find({}, 'content created_at author topic parent', { sort: '-created_at' })
     .populate('author', '_id name email avatar')
     .populate('topic', '_id title')
     .populate('parent')

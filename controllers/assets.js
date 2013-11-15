@@ -44,7 +44,7 @@ exports.index = function(req, res){
     };
 
     Asset
-    .find({}, null, { sort: [[ 'created_at', 'desc' ]]})
+    .find({}, null, { sort: '-created_at' })
     .limit(20)
     .run(function(err, assets){
       res_obj.assets = assets;
@@ -74,7 +74,7 @@ exports.index = function(req, res){
     res.locals.pagination = pagination;
 
     Asset
-    .find({}, null, { sort: [[ 'created_at', 'desc' ]]})
+    .find({}, null, { sort: '-created_at' })
     .exec(function(err, assets){
 
       res.locals({

@@ -97,9 +97,9 @@ exports.index = function(req, res){
 
 
     Topic
-    .find(query_obj, null, { sort: [[ 'updated_at', 'desc' ]]})
+    .find(query_obj, null, { sort: '-updated_at' })
     .populate('author')
-    .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+    .populate('tags', null, null, { sort: '-sequence -created_at' })
     .populate('comments')
     .limit(pagination.items_per_page)
     .skip(pagination.current_page * pagination.items_per_page)
@@ -156,7 +156,7 @@ exports.show = function(req, res, next){
   Topic
   .findById(topic_id)
   .populate('author')
-  .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .populate('tags', null, null, { sort: '-sequence -created_at' })
   .populate('comments')
   .exec(function(err, topic){
     if(err){
@@ -252,7 +252,7 @@ exports.create = function(req, res, next){
     tag_ids = [tag_ids];
   }
 
-  title = sanitize(title).xss();
+  title = sanitize(title).escape();
 
   res.locals({
     title: words.new + words.name,
@@ -410,7 +410,7 @@ exports.edit = function(req, res, next){
   Topic
   .findById(topic_id)
   .populate('author')
-  .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .populate('tags', null, null, { sort: '-sequence -created_at' })
   .exec(function(err, topic){
 
     if(err) return next();
@@ -477,7 +477,7 @@ exports.update = function(req, res, next){
     tag_ids = [tag_ids];
   }
 
-  title = sanitize(title).xss();
+  title = sanitize(title).escape();
 
   res.locals({
     title: words.edit + words.name,
@@ -488,7 +488,7 @@ exports.update = function(req, res, next){
   Topic
   .findById(topic_id)
   .populate('author')
-  .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .populate('tags', null, null, { sort: '-sequence -created_at' })
   .exec(function(err, topic){
 
     if(err) return next();
