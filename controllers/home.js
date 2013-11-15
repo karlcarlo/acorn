@@ -40,10 +40,11 @@ exports.index = function(req, res){
   query_obj.is_elite = true;
 
   Topic
-  .find(query_obj, null, { sort: [[ 'updated_at', 'desc' ]] })
+  .find(query_obj)
   .populate('author')
-  .populate('tags', null, null, { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .populate('tags', null, null, { sort: '-sequence -created_at' })
   .limit(6)
+  .sort('-updated_at')
   .exec(function(err, topics){
     res.locals.topics = topics;
     // 开源项目

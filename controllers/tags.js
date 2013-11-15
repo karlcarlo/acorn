@@ -42,7 +42,7 @@ exports.index = function(req, res, next){
   res.locals.pagination = pagination;
 
   Tag
-  .find({}, '_id name description sequence', { sort: [['sequence', 'desc'], [ 'created_at', 'desc' ]] })
+  .find({}, '_id name description sequence', { sort: 'sequence -created_at' })
   .exec(function(err, tags){
 
     if(req.params.format && req.params.format == 'json'){

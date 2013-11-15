@@ -120,7 +120,7 @@ exports.latest = function(req, res){
   };
 
   Topic
-  .find(query_obj, null, { sort: [[ 'updated_at', 'desc' ]]})
+  .find(query_obj, null, { sort: '-updated_at' })
   .populate('author')
   .limit(5)
   .exec(function(err, topics){
